@@ -66,6 +66,11 @@
             <artifactId>axon-core</artifactId>
             <version>${axon.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.axonframework</groupId>
+            <artifactId>axon-spring</artifactId>
+            <version>${axon.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
