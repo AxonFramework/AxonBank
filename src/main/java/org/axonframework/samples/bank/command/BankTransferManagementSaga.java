@@ -17,25 +17,24 @@
 package org.axonframework.samples.bank.command;
 
 import org.axonframework.commandhandling.CommandBus;
-import org.axonframework.commandhandling.CommandCallback;
-import org.axonframework.commandhandling.CommandMessage;
-import org.axonframework.commandhandling.GenericCommandMessage;
-import org.axonframework.commandhandling.callbacks.VoidCallback;
-import org.axonframework.commandhandling.model.AggregateNotFoundException;
 import org.axonframework.eventhandling.saga.EndSaga;
 import org.axonframework.eventhandling.saga.SagaEventHandler;
-import org.axonframework.eventhandling.saga.SagaLifecycle;
 import org.axonframework.eventhandling.saga.StartSaga;
 import org.axonframework.samples.bank.api.bankaccount.CreditDestinationBankAccountCommand;
 import org.axonframework.samples.bank.api.bankaccount.DebitSourceBankAccountCommand;
 import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountCreditedEvent;
+import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountNotFoundEvent;
 import org.axonframework.samples.bank.api.bankaccount.ReturnMoneyOfFailedBankTransferCommand;
 import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitedEvent;
+import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountNotFoundEvent;
 import org.axonframework.samples.bank.api.banktransfer.BankTransferCreatedEvent;
+import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitRejectedEvent;
 import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferCompletedCommand;
 import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferFailedCommand;
 import org.axonframework.spring.stereotype.Saga;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.axonframework.commandhandling.GenericCommandMessage.asCommandMessage;
 
 @Saga
 public class BankTransferManagementSaga {
@@ -61,34 +60,21 @@ public class BankTransferManagementSaga {
         DebitSourceBankAccountCommand command = new DebitSourceBankAccountCommand(event.getSourceBankAccountId(),
                                                                                   event.getBankTransferId(),
                                                                                   event.getAmount());
-        commandBus.dispatch(GenericCommandMessage.asCommandMessage(command),
-                            new CommandCallback<DebitSourceBankAccountCommand, Boolean>() {
-                                @Override
-                                public void onSuccess(CommandMessage<? extends DebitSourceBankAccountCommand> commandMessage,
-                                                      Boolean result) {
-                                    if (result.equals(Boolean.FALSE)) {
-                                        MarkBankTransferFailedCommand markFailedCommand = new MarkBankTransferFailedCommand(
-                                                event.getBankTransferId());
-                                        commandBus.dispatch(GenericCommandMessage.asCommandMessage(markFailedCommand));
+        commandBus.dispatch(asCommandMessage(command));
+    }
 
-                                        SagaLifecycle.end();
-                                    }
-                                }
+    @SagaEventHandler(associationProperty = "bankTransferId")
+    @EndSaga
+    public void on(SourceBankAccountNotFoundEvent event) {
+        MarkBankTransferFailedCommand markFailedCommand = new MarkBankTransferFailedCommand(event.getBankTransferId());
+        commandBus.dispatch(asCommandMessage(markFailedCommand));
+    }
 
-                                @Override
-                                public void onFailure(CommandMessage<? extends DebitSourceBankAccountCommand> commandMessage,
-                                                      Throwable cause) {
-                                    if (AggregateNotFoundException.class.isAssignableFrom(cause.getClass())) {
-                                        MarkBankTransferFailedCommand markFailedCommand = new MarkBankTransferFailedCommand(
-                                                event.getBankTransferId());
-                                        commandBus.dispatch(GenericCommandMessage.asCommandMessage(markFailedCommand));
-
-                                        SagaLifecycle.end();
-                                    } else {
-                                        throw new RuntimeException(cause);
-                                    }
-                                }
-                            });
+    @SagaEventHandler(associationProperty = "bankTransferId")
+    @EndSaga
+    public void on(SourceBankAccountDebitRejectedEvent event) {
+        MarkBankTransferFailedCommand markFailedCommand = new MarkBankTransferFailedCommand(event.getBankTransferId());
+        commandBus.dispatch(asCommandMessage(markFailedCommand));
     }
 
     @SagaEventHandler(associationProperty = "bankTransferId")
@@ -96,38 +82,26 @@ public class BankTransferManagementSaga {
         CreditDestinationBankAccountCommand command = new CreditDestinationBankAccountCommand(destinationBankAccountId,
                                                                                               event.getBankTransferId(),
                                                                                               event.getAmount());
-        commandBus.dispatch(GenericCommandMessage.asCommandMessage(command),
-                            new VoidCallback<CreditDestinationBankAccountCommand>() {
-                                @Override
-                                protected void onSuccess(CommandMessage<? extends CreditDestinationBankAccountCommand> commandMessage) {
+        commandBus.dispatch(asCommandMessage(command));
+    }
 
-                                }
+    @SagaEventHandler(associationProperty = "bankTransferId")
+    @EndSaga
+    public void on(DestinationBankAccountNotFoundEvent event) {
+        ReturnMoneyOfFailedBankTransferCommand returnMoneyCommand = new ReturnMoneyOfFailedBankTransferCommand(
+                event.getBankTransferId(),
+                amount);
+        commandBus.dispatch(asCommandMessage(returnMoneyCommand));
 
-                                @Override
-                                public void onFailure(CommandMessage<? extends CreditDestinationBankAccountCommand> commandMessage,
-                                                      Throwable cause) {
-                                    if (AggregateNotFoundException.class.isAssignableFrom(cause.getClass())) {
-                                        ReturnMoneyOfFailedBankTransferCommand returnMoneyCommand = new ReturnMoneyOfFailedBankTransferCommand(
-                                                event.getBankTransferId(),
-                                                event.getAmount());
-                                        commandBus.dispatch(GenericCommandMessage.asCommandMessage(returnMoneyCommand));
-
-                                        MarkBankTransferFailedCommand markFailedCommand = new MarkBankTransferFailedCommand(
-                                                event.getBankTransferId());
-                                        commandBus.dispatch(GenericCommandMessage.asCommandMessage(markFailedCommand));
-
-                                        SagaLifecycle.end();
-                                    } else {
-                                        throw new RuntimeException(cause);
-                                    }
-                                }
-                            });
+        MarkBankTransferFailedCommand markFailedCommand = new MarkBankTransferFailedCommand(
+                event.getBankTransferId());
+        commandBus.dispatch(asCommandMessage(markFailedCommand));
     }
 
     @EndSaga
     @SagaEventHandler(associationProperty = "bankTransferId")
     public void on(DestinationBankAccountCreditedEvent event) {
         MarkBankTransferCompletedCommand command = new MarkBankTransferCompletedCommand(event.getBankTransferId());
-        commandBus.dispatch(GenericCommandMessage.asCommandMessage(command));
+        commandBus.dispatch(asCommandMessage(command));
     }
 }

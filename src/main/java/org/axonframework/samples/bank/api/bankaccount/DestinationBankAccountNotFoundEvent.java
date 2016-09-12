@@ -16,25 +16,15 @@
 
 package org.axonframework.samples.bank.api.bankaccount;
 
-import org.axonframework.commandhandling.TargetAggregateIdentifier;
+public class DestinationBankAccountNotFoundEvent {
 
-public class ReturnMoneyOfFailedBankTransferCommand {
+    private String bankTransferId;
 
-    @TargetAggregateIdentifier
-    private String bankAccountId;
-    private long amount;
-
-    public String getBankAccountId() {
-        return bankAccountId;
+    public DestinationBankAccountNotFoundEvent(String bankTransferId) {
+        this.bankTransferId = bankTransferId;
     }
 
-    public long getAmount() {
-        return amount;
-    }
-
-    public ReturnMoneyOfFailedBankTransferCommand(String bankAccountId, long amount) {
-
-        this.bankAccountId = bankAccountId;
-        this.amount = amount;
+    public String getBankTransferId() {
+        return bankTransferId;
     }
 }

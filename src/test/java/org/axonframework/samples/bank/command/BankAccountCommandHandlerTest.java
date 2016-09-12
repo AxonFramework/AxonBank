@@ -2,25 +2,28 @@ package org.axonframework.samples.bank.command;
 
 import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
 import org.axonframework.messaging.interceptors.JSR303ViolationException;
-import org.axonframework.samples.bank.api.bankaccount.DepositMoneyCommand;
-import org.axonframework.test.FixtureConfiguration;
-import org.axonframework.test.Fixtures;
 import org.axonframework.samples.bank.api.bankaccount.BankAccountCreatedEvent;
 import org.axonframework.samples.bank.api.bankaccount.CreateBankAccountCommand;
+import org.axonframework.samples.bank.api.bankaccount.DepositMoneyCommand;
 import org.axonframework.samples.bank.api.bankaccount.MoneyDepositedEvent;
 import org.axonframework.samples.bank.api.bankaccount.MoneyWithdrawnEvent;
 import org.axonframework.samples.bank.api.bankaccount.WithdrawMoneyCommand;
+import org.axonframework.test.FixtureConfiguration;
+import org.axonframework.test.Fixtures;
 import org.junit.*;
 
 import java.util.UUID;
 
-public class BankAccountTest {
+public class BankAccountCommandHandlerTest {
 
     private FixtureConfiguration<BankAccount> testFixture;
 
     @Before
     public void setUp() throws Exception {
         testFixture = Fixtures.newGivenWhenThenFixture(BankAccount.class);
+
+        testFixture.registerAnnotatedCommandHandler(new BankAccountCommandHandler(testFixture.getRepository(),
+                                                                                  testFixture.getEventBus()));
         testFixture.registerCommandDispatchInterceptor(new BeanValidationInterceptor<>());
     }
 
@@ -65,5 +68,4 @@ public class BankAccountTest {
                    .when(new WithdrawMoneyCommand(id, 51))
                    .expectEvents();
     }
-
 }

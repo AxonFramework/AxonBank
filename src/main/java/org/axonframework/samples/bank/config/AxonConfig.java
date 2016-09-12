@@ -17,6 +17,7 @@
 package org.axonframework.samples.bank.config;
 
 import org.axonframework.commandhandling.AggregateAnnotationCommandHandler;
+import org.axonframework.commandhandling.AnnotationCommandHandlerAdapter;
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.SimpleCommandBus;
 import org.axonframework.commandhandling.model.Repository;
@@ -35,6 +36,7 @@ import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.axonframework.eventsourcing.eventstore.inmemory.InMemoryEventStorageEngine;
 import org.axonframework.samples.bank.command.BankAccount;
+import org.axonframework.samples.bank.command.BankAccountCommandHandler;
 import org.axonframework.samples.bank.command.BankTransfer;
 import org.axonframework.samples.bank.command.BankTransferManagementSaga;
 import org.axonframework.samples.bank.query.bankaccount.BankAccountEventListener;
@@ -68,13 +70,17 @@ public class AxonConfig {
     }
 
     @Bean
-    public AggregateAnnotationCommandHandler<BankAccount> bankAccountCommandHandler() {
-        AggregateAnnotationCommandHandler<BankAccount> commandHandler = new AggregateAnnotationCommandHandler<>(
-                BankAccount.class,
-                bankAccountEventSourcingRepository());
-        commandHandler.subscribe(commandBus());
+    public BankAccountCommandHandler bankAccountCommandHandler() {
+        return new BankAccountCommandHandler(bankAccountEventSourcingRepository(), eventStore());
+    }
 
-        return commandHandler;
+    @Bean
+    public AnnotationCommandHandlerAdapter annotationBankAccountCommandHandler() {
+        AnnotationCommandHandlerAdapter annotationCommandHandlerAdapter = new AnnotationCommandHandlerAdapter(
+                bankAccountCommandHandler());
+        annotationCommandHandlerAdapter.subscribe(commandBus());
+
+        return annotationCommandHandlerAdapter;
     }
 
     @Bean

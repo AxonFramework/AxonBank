@@ -16,24 +16,18 @@
 
 package org.axonframework.samples.bank.command;
 
-import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.commandhandling.model.AggregateIdentifier;
 import org.axonframework.commandhandling.model.AggregateRoot;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.samples.bank.api.bankaccount.BankAccountCreatedEvent;
-import org.axonframework.samples.bank.api.bankaccount.CreateBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.CreditDestinationBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.DebitSourceBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.DepositMoneyCommand;
 import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountCreditedEvent;
 import org.axonframework.samples.bank.api.bankaccount.MoneyAddedEvent;
 import org.axonframework.samples.bank.api.bankaccount.MoneyDepositedEvent;
 import org.axonframework.samples.bank.api.bankaccount.MoneyOfFailedBankTransferReturnedEvent;
 import org.axonframework.samples.bank.api.bankaccount.MoneySubtractedEvent;
 import org.axonframework.samples.bank.api.bankaccount.MoneyWithdrawnEvent;
-import org.axonframework.samples.bank.api.bankaccount.ReturnMoneyOfFailedBankTransferCommand;
 import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitedEvent;
-import org.axonframework.samples.bank.api.bankaccount.WithdrawMoneyCommand;
+import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitRejectedEvent;
 
 import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
 
@@ -49,44 +43,35 @@ public class BankAccount {
     private BankAccount() {
     }
 
-    @CommandHandler
-    public BankAccount(CreateBankAccountCommand command) {
-        apply(new BankAccountCreatedEvent(command.getBankAccountId(), command.getOverdraftLimit()));
+    public BankAccount(String bankAccountId, long overdraftLimit) {
+        apply(new BankAccountCreatedEvent(bankAccountId, overdraftLimit));
     }
 
-    @CommandHandler
-    public void handle(DepositMoneyCommand command) {
-        apply(new MoneyDepositedEvent(command.getBankAccountId(), command.getAmountOfMoney()));
+    public void deposit(long amount) {
+        apply(new MoneyDepositedEvent(id, amount));
     }
 
-    @CommandHandler
-    public void handle(WithdrawMoneyCommand command) {
-        if (command.getAmountOfMoney() <= balanceInCents + overdraftLimit) {
-            apply(new MoneyWithdrawnEvent(command.getBankAccountId(), command.getAmountOfMoney()));
+    public void withdraw(long amount) {
+        if (amount <= balanceInCents + overdraftLimit) {
+            apply(new MoneyWithdrawnEvent(id, amount));
         }
     }
 
-    @CommandHandler
-    public boolean handle(DebitSourceBankAccountCommand command) {
-        if (command.getAmount() <= balanceInCents + overdraftLimit) {
-            apply(new SourceBankAccountDebitedEvent(command.getBankAccountId(),
-                                                    command.getAmount(),
-                                                    command.getBankTransferId()));
-            return true;
+    public void debit(long amount, String bankTransferId) {
+        if (amount <= balanceInCents + overdraftLimit) {
+            apply(new SourceBankAccountDebitedEvent(id, amount, bankTransferId));
         }
-        return false;
+        else {
+            apply(new SourceBankAccountDebitRejectedEvent(bankTransferId));
+        }
     }
 
-    @CommandHandler
-    public void handle(CreditDestinationBankAccountCommand command) {
-        apply(new DestinationBankAccountCreditedEvent(command.getBankAccountId(),
-                                                      command.getAmount(),
-                                                      command.getBankTransferId()));
+    public void credit(long amount, String bankTransferId) {
+        apply(new DestinationBankAccountCreditedEvent(id, amount, bankTransferId));
     }
 
-    @CommandHandler
-    public void handle(ReturnMoneyOfFailedBankTransferCommand command) {
-        apply(new MoneyOfFailedBankTransferReturnedEvent(command.getId(), command.getAmount()));
+    public void returnMoney(long amount) {
+        apply(new MoneyOfFailedBankTransferReturnedEvent(id, amount));
     }
 
     @EventHandler
