@@ -16,24 +16,13 @@
 
 package org.axonframework.samples.bank.api.bankaccount;
 
+import lombok.Value;
 import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
+@Value
 public class WithdrawMoneyCommand {
 
     @TargetAggregateIdentifier
-    private final String bankAccountId;
-    private final long amountOfMoney;
-
-    public String getBankAccountId() {
-        return bankAccountId;
-    }
-
-    public long getAmountOfMoney() {
-        return amountOfMoney;
-    }
-
-    public WithdrawMoneyCommand(String bankAccountId, long amountOfMoney) {
-        this.bankAccountId = bankAccountId;
-        this.amountOfMoney = amountOfMoney;
-    }
+    private String bankAccountId;
+    private long amountOfMoney;
 }

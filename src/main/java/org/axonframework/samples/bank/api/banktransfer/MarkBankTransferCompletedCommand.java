@@ -16,18 +16,12 @@
 
 package org.axonframework.samples.bank.api.banktransfer;
 
+import lombok.Value;
 import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
+@Value
 public class MarkBankTransferCompletedCommand {
 
     @TargetAggregateIdentifier
     private String bankTransferId;
-
-    public MarkBankTransferCompletedCommand(String bankTransferId) {
-        this.bankTransferId = bankTransferId;
-    }
-
-    public String getBankTransferId() {
-        return bankTransferId;
-    }
 }

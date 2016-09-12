@@ -16,21 +16,13 @@
 
 package org.axonframework.samples.bank.api.bankaccount;
 
+import lombok.Value;
+import lombok.experimental.NonFinal;
+
+@Value
+@NonFinal
 public abstract class MoneySubtractedEvent {
 
-    private final String bankAccountId;
-    private final long amountOfMoney;
-
-    public String getBankAccountId() {
-        return bankAccountId;
-    }
-
-    public long getAmount() {
-        return amountOfMoney;
-    }
-
-    public MoneySubtractedEvent(String bankAccountId, long amountOfMoney) {
-        this.bankAccountId = bankAccountId;
-        this.amountOfMoney = amountOfMoney;
-    }
+    private String bankAccountId;
+    private long amount;
 }

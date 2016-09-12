@@ -16,15 +16,10 @@
 
 package org.axonframework.samples.bank.api.bankaccount;
 
+import lombok.Value;
+
+@Value
 public class DestinationBankAccountNotFoundEvent {
 
     private String bankTransferId;
-
-    public DestinationBankAccountNotFoundEvent(String bankTransferId) {
-        this.bankTransferId = bankTransferId;
-    }
-
-    public String getBankTransferId() {
-        return bankTransferId;
-    }
 }

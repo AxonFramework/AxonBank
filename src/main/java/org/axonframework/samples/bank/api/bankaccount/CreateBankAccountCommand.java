@@ -16,27 +16,16 @@
 
 package org.axonframework.samples.bank.api.bankaccount;
 
+import lombok.Value;
 import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
 import javax.validation.constraints.Min;
 
+@Value
 public class CreateBankAccountCommand {
 
     @TargetAggregateIdentifier
     private String bankAccountId;
     @Min(value = 0, message = "Overdraft limit must not be less than zero")
     private long overdraftLimit;
-
-    public CreateBankAccountCommand(String bankAccountId, long overdraftLimit) {
-        this.bankAccountId = bankAccountId;
-        this.overdraftLimit = overdraftLimit;
-    }
-
-    public String getBankAccountId() {
-        return bankAccountId;
-    }
-
-    public long getOverdraftLimit() {
-        return overdraftLimit;
-    }
 }

@@ -16,15 +16,10 @@
 
 package org.axonframework.samples.bank.api.banktransfer;
 
+import lombok.Value;
+
+@Value
 public class BankTransferCompletedEvent {
 
     private String bankTransferId;
-
-    public BankTransferCompletedEvent(String bankTransferId) {
-        this.bankTransferId = bankTransferId;
-    }
-
-    public String getBankTransferId() {
-        return bankTransferId;
-    }
 }

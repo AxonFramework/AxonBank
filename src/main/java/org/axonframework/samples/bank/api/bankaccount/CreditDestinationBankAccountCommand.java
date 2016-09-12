@@ -16,30 +16,14 @@
 
 package org.axonframework.samples.bank.api.bankaccount;
 
+import lombok.Value;
 import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
+@Value
 public class CreditDestinationBankAccountCommand {
 
     @TargetAggregateIdentifier
     private String bankAccountId;
     private String bankTransferId;
     private long amount;
-
-    public CreditDestinationBankAccountCommand(String bankAccountId, String bankTransferId, long amount) {
-        this.bankAccountId = bankAccountId;
-        this.bankTransferId = bankTransferId;
-        this.amount = amount;
-    }
-
-    public String getBankAccountId() {
-        return bankAccountId;
-    }
-
-    public String getBankTransferId() {
-        return bankTransferId;
-    }
-
-    public long getAmount() {
-        return amount;
-    }
 }
