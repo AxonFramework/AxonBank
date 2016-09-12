@@ -89,7 +89,7 @@ public class BankTransferManagementSaga {
     @EndSaga
     public void on(DestinationBankAccountNotFoundEvent event) {
         ReturnMoneyOfFailedBankTransferCommand returnMoneyCommand = new ReturnMoneyOfFailedBankTransferCommand(
-                event.getBankTransferId(),
+                sourceBankAccountId,
                 amount);
         commandBus.dispatch(asCommandMessage(returnMoneyCommand));
 
