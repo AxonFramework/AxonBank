@@ -19,6 +19,8 @@ package org.axonframework.samples.bank.web;
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.GenericCommandMessage;
 import org.axonframework.samples.bank.api.bankaccount.CreateBankAccountCommand;
+import org.axonframework.samples.bank.api.bankaccount.DepositMoneyCommand;
+import org.axonframework.samples.bank.api.bankaccount.WithdrawMoneyCommand;
 import org.axonframework.samples.bank.query.bankaccount.BankAccountEntry;
 import org.axonframework.samples.bank.query.bankaccount.BankAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,5 +64,17 @@ public class BankAccountController {
         commandBus.dispatch(GenericCommandMessage.asCommandMessage(command));
 
         return id;
+    }
+
+    @PostMapping("/{id}/withdrawals")
+    public void withdraw(@PathVariable String id, @RequestParam("amount") long amount) {
+        WithdrawMoneyCommand command = new WithdrawMoneyCommand(id, amount);
+        commandBus.dispatch(GenericCommandMessage.asCommandMessage(command));
+    }
+
+    @PostMapping("/{id}/deposits")
+    public void deposit(@PathVariable String id, @RequestParam("amount") long amount) {
+        DepositMoneyCommand command = new DepositMoneyCommand(id, amount);
+        commandBus.dispatch(GenericCommandMessage.asCommandMessage(command));
     }
 }
