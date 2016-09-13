@@ -35,6 +35,7 @@ import org.axonframework.eventsourcing.eventstore.EmbeddedEventStore;
 import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.axonframework.eventsourcing.eventstore.inmemory.InMemoryEventStorageEngine;
+import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
 import org.axonframework.samples.bank.command.BankAccount;
 import org.axonframework.samples.bank.command.BankAccountCommandHandler;
 import org.axonframework.samples.bank.command.BankTransfer;
@@ -46,6 +47,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
+
 @Configuration
 public class AxonConfig {
 
@@ -56,7 +59,10 @@ public class AxonConfig {
 
     @Bean
     public CommandBus commandBus() {
-        return new SimpleCommandBus();
+        SimpleCommandBus simpleCommandBus = new SimpleCommandBus();
+        simpleCommandBus.setDispatchInterceptors(Arrays.asList(new BeanValidationInterceptor<>()));
+
+        return simpleCommandBus;
     }
 
     @Bean
