@@ -46,6 +46,7 @@ import org.axonframework.spring.saga.SpringResourceInjector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.util.Arrays;
 
@@ -57,8 +58,14 @@ public class AxonConfig {
     @Autowired
     private BankTransferEventListener bankTransferEventListener;
 
+    @Autowired
+    private CommandBus commandBus;
+    @Autowired
+    private SagaStore sagaStore;
+
     @Bean
-    public CommandBus commandBus() {
+    @Profile("!distributed-command-bus")
+    public CommandBus simpleCommandBus() {
         SimpleCommandBus simpleCommandBus = new SimpleCommandBus();
         simpleCommandBus.setDispatchInterceptors(Arrays.asList(new BeanValidationInterceptor<>()));
 
@@ -84,7 +91,7 @@ public class AxonConfig {
     public AnnotationCommandHandlerAdapter annotationBankAccountCommandHandler() {
         AnnotationCommandHandlerAdapter annotationCommandHandlerAdapter = new AnnotationCommandHandlerAdapter(
                 bankAccountCommandHandler());
-        annotationCommandHandlerAdapter.subscribe(commandBus());
+        annotationCommandHandlerAdapter.subscribe(commandBus);
 
         return annotationCommandHandlerAdapter;
     }
@@ -94,7 +101,7 @@ public class AxonConfig {
         AggregateAnnotationCommandHandler<BankTransfer> commandHandler = new AggregateAnnotationCommandHandler<>(
                 BankTransfer.class,
                 bankTransferEventSourcingRepository());
-        commandHandler.subscribe(commandBus());
+        commandHandler.subscribe(commandBus);
 
         return commandHandler;
     }
@@ -112,7 +119,7 @@ public class AxonConfig {
     @Bean
     public SagaRepository<BankTransferManagementSaga> sagaRepository() {
         return new AnnotatedSagaRepository<>(BankTransferManagementSaga.class,
-                                             sagaStore(),
+                                             sagaStore,
                                              resourceInjector());
     }
 
@@ -137,7 +144,8 @@ public class AxonConfig {
     }
 
     @Bean
-    public SagaStore<Object> sagaStore() {
+    @Profile("!distributed-command-bus")
+    public SagaStore<Object> inMemorySagaStore() {
         return new InMemorySagaStore();
     }
 
