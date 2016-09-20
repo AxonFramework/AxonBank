@@ -32,6 +32,7 @@ import org.axonframework.serialization.xml.XStreamSerializer;
 import org.axonframework.spring.commandhandling.distributed.jgroups.JGroupsConnectorFactoryBean;
 import org.axonframework.spring.config.TransactionManagerFactoryBean;
 import org.axonframework.spring.messaging.unitofwork.SpringTransactionManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,6 +55,9 @@ public class DistributedCommandBusConfig {
     @PersistenceUnit
     private EntityManagerFactory entityManagerFactory;
 
+    @Autowired
+    private SpringTransactionManager springTransactionManager;
+
     @Bean
     public Serializer serializer() {
         return new XStreamSerializer();
@@ -63,7 +67,7 @@ public class DistributedCommandBusConfig {
     public JGroupsConnectorFactoryBean jGroupsConnectorFactoryBean() throws Exception {
         SimpleCommandBus localSegment = new SimpleCommandBus();
         localSegment.setDispatchInterceptors(Arrays.asList(new BeanValidationInterceptor<>()));
-        localSegment.setTransactionManager(springTransactionManager());
+        localSegment.setTransactionManager(springTransactionManager);
 
         JGroupsConnectorFactoryBean jGroupsConnectorFactoryBean = new JGroupsConnectorFactoryBean();
         jGroupsConnectorFactoryBean.setLocalSegment(localSegment);
