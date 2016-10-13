@@ -22,8 +22,8 @@ import org.axonframework.samples.bank.api.banktransfer.BankTransferFailedEvent;
 import org.axonframework.samples.bank.api.banktransfer.CreateBankTransferCommand;
 import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferCompletedCommand;
 import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferFailedCommand;
-import org.axonframework.test.FixtureConfiguration;
-import org.axonframework.test.Fixtures;
+import org.axonframework.test.aggregate.AggregateTestFixture;
+import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.*;
 
 public class BankTransferTest {
@@ -32,7 +32,7 @@ public class BankTransferTest {
 
     @Before
     public void setUp() throws Exception {
-        fixture = Fixtures.newGivenWhenThenFixture(BankTransfer.class);
+        fixture = new AggregateTestFixture<>(BankTransfer.class);
     }
 
     @Test

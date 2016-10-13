@@ -24,8 +24,8 @@ import org.axonframework.samples.bank.api.bankaccount.DepositMoneyCommand;
 import org.axonframework.samples.bank.api.bankaccount.MoneyDepositedEvent;
 import org.axonframework.samples.bank.api.bankaccount.MoneyWithdrawnEvent;
 import org.axonframework.samples.bank.api.bankaccount.WithdrawMoneyCommand;
-import org.axonframework.test.FixtureConfiguration;
-import org.axonframework.test.Fixtures;
+import org.axonframework.test.aggregate.AggregateTestFixture;
+import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.*;
 
 import java.util.UUID;
@@ -36,7 +36,7 @@ public class BankAccountCommandHandlerTest {
 
     @Before
     public void setUp() throws Exception {
-        testFixture = Fixtures.newGivenWhenThenFixture(BankAccount.class);
+        testFixture = new AggregateTestFixture<>(BankAccount.class);
 
         testFixture.registerAnnotatedCommandHandler(new BankAccountCommandHandler(testFixture.getRepository(),
                                                                                   testFixture.getEventBus()));

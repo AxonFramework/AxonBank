@@ -11,8 +11,8 @@ import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountNotFoundE
 import org.axonframework.samples.bank.api.banktransfer.BankTransferCreatedEvent;
 import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferCompletedCommand;
 import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferFailedCommand;
-import org.axonframework.test.saga.AnnotatedSagaTestFixture;
 import org.axonframework.test.saga.FixtureConfiguration;
+import org.axonframework.test.saga.SagaTestFixture;
 import org.junit.*;
 
 public class BankTransferManagementSagaTest {
@@ -21,7 +21,7 @@ public class BankTransferManagementSagaTest {
 
     @Before
     public void setUp() throws Exception {
-        testFixture = new AnnotatedSagaTestFixture<>(BankTransferManagementSaga.class);
+        testFixture = new SagaTestFixture<>(BankTransferManagementSaga.class);
     }
 
     @Test

@@ -25,14 +25,15 @@ import org.axonframework.samples.bank.api.bankaccount.DebitSourceBankAccountComm
 import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountCreditedEvent;
 import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountNotFoundEvent;
 import org.axonframework.samples.bank.api.bankaccount.ReturnMoneyOfFailedBankTransferCommand;
+import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitRejectedEvent;
 import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitedEvent;
 import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountNotFoundEvent;
 import org.axonframework.samples.bank.api.banktransfer.BankTransferCreatedEvent;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitRejectedEvent;
 import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferCompletedCommand;
 import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferFailedCommand;
 import org.axonframework.spring.stereotype.Saga;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.inject.Inject;
 
 import static org.axonframework.commandhandling.GenericCommandMessage.asCommandMessage;
 
@@ -41,7 +42,7 @@ public class BankTransferManagementSaga {
 
     private transient CommandBus commandBus;
 
-    @Autowired
+    @Inject
     public void setCommandBus(CommandBus commandBus) {
         this.commandBus = commandBus;
     }

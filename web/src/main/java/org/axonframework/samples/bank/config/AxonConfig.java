@@ -31,8 +31,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.util.Arrays;
-
 @Configuration
 public class AxonConfig {
 
@@ -40,7 +38,7 @@ public class AxonConfig {
     @Profile("!distributed-command-bus")
     public CommandBus simpleCommandBus() {
         SimpleCommandBus simpleCommandBus = new SimpleCommandBus();
-        simpleCommandBus.setDispatchInterceptors(Arrays.asList(new BeanValidationInterceptor<>()));
+        simpleCommandBus.registerDispatchInterceptor(new BeanValidationInterceptor<>());
 
         return simpleCommandBus;
     }

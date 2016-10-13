@@ -27,6 +27,7 @@ import org.axonframework.eventhandling.saga.repository.jpa.JpaSagaStore;
 import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
 import org.axonframework.eventsourcing.eventstore.jpa.JpaEventStorageEngine;
 import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
+import org.axonframework.monitoring.NoOpMessageMonitor;
 import org.axonframework.serialization.Serializer;
 import org.axonframework.serialization.xml.XStreamSerializer;
 import org.axonframework.spring.commandhandling.distributed.jgroups.JGroupsConnectorFactoryBean;
@@ -41,7 +42,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.beans.PropertyVetoException;
-import java.util.Arrays;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 
@@ -65,9 +65,8 @@ public class DistributedCommandBusConfig {
 
     @Bean
     public JGroupsConnectorFactoryBean jGroupsConnectorFactoryBean() throws Exception {
-        SimpleCommandBus localSegment = new SimpleCommandBus();
-        localSegment.setDispatchInterceptors(Arrays.asList(new BeanValidationInterceptor<>()));
-        localSegment.setTransactionManager(springTransactionManager);
+        SimpleCommandBus localSegment = new SimpleCommandBus(springTransactionManager, NoOpMessageMonitor.INSTANCE);
+        localSegment.registerDispatchInterceptor(new BeanValidationInterceptor<>());
 
         JGroupsConnectorFactoryBean jGroupsConnectorFactoryBean = new JGroupsConnectorFactoryBean();
         jGroupsConnectorFactoryBean.setLocalSegment(localSegment);
@@ -83,7 +82,7 @@ public class DistributedCommandBusConfig {
 
     @Bean
     public EventStorageEngine eventStorageEngine() throws Exception {
-        return new JpaEventStorageEngine(entityManagerProvider(), springTransactionManager());
+        return new JpaEventStorageEngine(entityManagerProvider());
     }
 
     @Bean
