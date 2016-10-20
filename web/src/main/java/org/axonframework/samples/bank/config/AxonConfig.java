@@ -18,21 +18,27 @@ package org.axonframework.samples.bank.config;
 
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.SimpleCommandBus;
+import org.axonframework.eventhandling.EventBus;
 import org.axonframework.eventhandling.saga.ResourceInjector;
-import org.axonframework.eventhandling.saga.repository.SagaStore;
-import org.axonframework.eventhandling.saga.repository.inmemory.InMemorySagaStore;
-import org.axonframework.eventsourcing.eventstore.EmbeddedEventStore;
 import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
-import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.axonframework.eventsourcing.eventstore.inmemory.InMemoryEventStorageEngine;
 import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
+import org.axonframework.samples.bank.command.BankAccount;
+import org.axonframework.samples.bank.command.BankAccountCommandHandler;
+import org.axonframework.spring.config.AxonConfiguration;
 import org.axonframework.spring.saga.SpringResourceInjector;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class AxonConfig {
+
+    @Autowired
+    private AxonConfiguration axonConfiguration;
+    @Autowired
+    private EventBus eventBus;
 
     @Bean
     @Profile("!distributed-command-bus")
@@ -44,23 +50,19 @@ public class AxonConfig {
     }
 
     @Bean
-    @Profile("!distributed-command-bus")
-    public SagaStore<Object> inMemorySagaStore() {
-        return new InMemorySagaStore();
-    }
-
-    @Bean
-    public EventStore eventStore() {
-        return new EmbeddedEventStore(eventStorageEngine());
-    }
-
-    @Bean
     public EventStorageEngine eventStorageEngine() {
         return new InMemoryEventStorageEngine();
+    }
+
+    @Bean
+    public BankAccountCommandHandler bankAccountCommandHandler() {
+        return new BankAccountCommandHandler(axonConfiguration.repository(BankAccount.class), eventBus);
     }
 
     @Bean
     public ResourceInjector resourceInjector() {
         return new SpringResourceInjector();
     }
+
 }
+

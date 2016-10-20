@@ -17,7 +17,6 @@
 package org.axonframework.samples.bank.command;
 
 import org.axonframework.commandhandling.model.AggregateIdentifier;
-import org.axonframework.commandhandling.model.AggregateRoot;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.samples.bank.api.bankaccount.BankAccountCreatedEvent;
 import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountCreditedEvent;
@@ -26,12 +25,13 @@ import org.axonframework.samples.bank.api.bankaccount.MoneyDepositedEvent;
 import org.axonframework.samples.bank.api.bankaccount.MoneyOfFailedBankTransferReturnedEvent;
 import org.axonframework.samples.bank.api.bankaccount.MoneySubtractedEvent;
 import org.axonframework.samples.bank.api.bankaccount.MoneyWithdrawnEvent;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitedEvent;
 import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitRejectedEvent;
+import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitedEvent;
+import org.axonframework.spring.stereotype.Aggregate;
 
 import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
 
-@AggregateRoot
+@Aggregate
 public class BankAccount {
 
     @AggregateIdentifier

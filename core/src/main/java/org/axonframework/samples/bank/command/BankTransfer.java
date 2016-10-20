@@ -25,9 +25,11 @@ import org.axonframework.samples.bank.api.banktransfer.BankTransferFailedEvent;
 import org.axonframework.samples.bank.api.banktransfer.CreateBankTransferCommand;
 import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferCompletedCommand;
 import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferFailedCommand;
+import org.axonframework.spring.stereotype.Aggregate;
 
 import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
 
+@Aggregate
 public class BankTransfer {
 
     @AggregateIdentifier
