@@ -16,21 +16,13 @@
 
 package org.axonframework.samples.bank.config;
 
-import org.axonframework.commandhandling.CommandBus;
-import org.axonframework.commandhandling.SimpleCommandBus;
 import org.axonframework.eventhandling.EventBus;
-import org.axonframework.eventhandling.saga.ResourceInjector;
-import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
-import org.axonframework.eventsourcing.eventstore.inmemory.InMemoryEventStorageEngine;
-import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
 import org.axonframework.samples.bank.command.BankAccount;
 import org.axonframework.samples.bank.command.BankAccountCommandHandler;
 import org.axonframework.spring.config.AxonConfiguration;
-import org.axonframework.spring.saga.SpringResourceInjector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class AxonConfig {
@@ -41,28 +33,8 @@ public class AxonConfig {
     private EventBus eventBus;
 
     @Bean
-    @Profile("!distributed-command-bus")
-    public CommandBus simpleCommandBus() {
-        SimpleCommandBus simpleCommandBus = new SimpleCommandBus();
-        simpleCommandBus.registerDispatchInterceptor(new BeanValidationInterceptor<>());
-
-        return simpleCommandBus;
-    }
-
-    @Bean
-    public EventStorageEngine eventStorageEngine() {
-        return new InMemoryEventStorageEngine();
-    }
-
-    @Bean
     public BankAccountCommandHandler bankAccountCommandHandler() {
         return new BankAccountCommandHandler(axonConfiguration.repository(BankAccount.class), eventBus);
     }
 
-    @Bean
-    public ResourceInjector resourceInjector() {
-        return new SpringResourceInjector();
-    }
-
 }
-

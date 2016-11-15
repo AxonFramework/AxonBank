@@ -18,21 +18,12 @@ package org.axonframework.samples.bank.config;
 
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.SimpleCommandBus;
-import org.axonframework.commandhandling.distributed.DistributedCommandBus;
-import org.axonframework.commandhandling.distributed.jgroups.JGroupsConnector;
-import org.axonframework.common.jpa.ContainerManagedEntityManagerProvider;
 import org.axonframework.common.jpa.EntityManagerProvider;
+import org.axonframework.common.transaction.TransactionManager;
 import org.axonframework.eventhandling.saga.repository.SagaStore;
 import org.axonframework.eventhandling.saga.repository.jpa.JpaSagaStore;
-import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
-import org.axonframework.eventsourcing.eventstore.jpa.JpaEventStorageEngine;
 import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
 import org.axonframework.monitoring.NoOpMessageMonitor;
-import org.axonframework.serialization.Serializer;
-import org.axonframework.serialization.xml.XStreamSerializer;
-import org.axonframework.spring.commandhandling.distributed.jgroups.JGroupsConnectorFactoryBean;
-import org.axonframework.spring.config.TransactionManagerFactoryBean;
-import org.axonframework.spring.messaging.unitofwork.SpringTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -52,47 +43,17 @@ import javax.persistence.PersistenceUnit;
 @Profile("distributed-command-bus")
 public class DistributedCommandBusConfig {
 
+    @Autowired
+    private TransactionManager transactionManager;
     @PersistenceUnit
     private EntityManagerFactory entityManagerFactory;
 
-    @Autowired
-    private SpringTransactionManager springTransactionManager;
-
     @Bean
-    public Serializer serializer() {
-        return new XStreamSerializer();
-    }
-
-    @Bean
-    public JGroupsConnectorFactoryBean jGroupsConnectorFactoryBean() throws Exception {
-        SimpleCommandBus localSegment = new SimpleCommandBus(springTransactionManager, NoOpMessageMonitor.INSTANCE);
+    public CommandBus localSegment() {
+        SimpleCommandBus localSegment = new SimpleCommandBus(transactionManager, NoOpMessageMonitor.INSTANCE);
         localSegment.registerDispatchInterceptor(new BeanValidationInterceptor<>());
 
-        JGroupsConnectorFactoryBean jGroupsConnectorFactoryBean = new JGroupsConnectorFactoryBean();
-        jGroupsConnectorFactoryBean.setLocalSegment(localSegment);
-
-        return jGroupsConnectorFactoryBean;
-    }
-
-    @Bean
-    public CommandBus distributedCommandBus() throws Exception {
-        JGroupsConnector jGroupsConnector = jGroupsConnectorFactoryBean().getObject();
-        return new DistributedCommandBus(jGroupsConnector, jGroupsConnector);
-    }
-
-    @Bean
-    public EventStorageEngine eventStorageEngine() throws Exception {
-        return new JpaEventStorageEngine(entityManagerProvider());
-    }
-
-    @Bean
-    public EntityManagerProvider entityManagerProvider() {
-        return new ContainerManagedEntityManagerProvider();
-    }
-
-    @Bean
-    public SpringTransactionManager springTransactionManager() throws Exception {
-        return new SpringTransactionManager(transactionManager());
+        return localSegment;
     }
 
     @Bean
@@ -101,15 +62,7 @@ public class DistributedCommandBusConfig {
     }
 
     @Bean
-    public TransactionManagerFactoryBean transactionManagerFactoryBean() throws PropertyVetoException {
-        TransactionManagerFactoryBean factoryBean = new TransactionManagerFactoryBean();
-        factoryBean.setTransactionManager(transactionManager());
-
-        return factoryBean;
-    }
-
-    @Bean
-    public SagaStore<Object> jpaSagaStore() {
-        return new JpaSagaStore(entityManagerProvider());
+    public SagaStore<Object> jpaSagaStore(EntityManagerProvider entityManagerProvider) {
+        return new JpaSagaStore(entityManagerProvider);
     }
 }
