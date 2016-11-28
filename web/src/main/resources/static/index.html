@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="axonBank">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" href="favicon.ico">
+
+    <title>Axon Bank</title>
+
+    <link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/webjars/bootswatch-cosmo/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="/app/app.css"/>
+</head>
+
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Axon Bank</a>
+        </div>
+    </div>
+</nav>
+
+<div ng-controller="BankAccountsCtrl" class="container">
+    <div class="col-lg-12">
+        <table class="table table-hover table-condensed table-striped">
+            <caption>
+                Bank Accounts
+                <div class="pull-right">
+                    <button ng-click="create()" class="btn btn-sm btn-success" type="submit">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        Create
+                    </button>
+                </div>
+            </caption>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Balance</th>
+                <th>Overdraft Limit</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="bankAccount in bankAccounts">
+                <td>{{bankAccount.id}}</td>
+                <td>{{bankAccount.balance}}</td>
+                <td>{{bankAccount.overdraftLimit}}</td>
+                <td>
+                    <button ng-click="deposit(bankAccount.id)" class="btn btn-sm btn-primary" type="submit">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        Deposit
+                    </button>
+                    <button ng-click="withdraw(bankAccount.id)" class="btn btn-sm btn-success" type="submit">
+                        <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                        Withdraw
+                    </button>
+                    <button ng-click="transfer(bankAccount.id)" class="btn btn-sm btn-info" type="submit">
+                        <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
+                        Transfer
+                    </button>
+                    <button ng-click="bankTransfers(bankAccount.id)" class="btn btn-sm btn-warning" type="submit">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        Bank Transfers
+                    </button>
+                </td>
+            </tr>
+            <tr ng-if="bankAccounts.length == 0">
+                <td colspan="4">There are no bank accounts</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript" src="/webjars/angularjs/angular.min.js"></script>
+<script type="text/javascript" src="/webjars/angular-ui-bootstrap/ui-bootstrap.min.js"></script>
+<script type="text/javascript" src="/webjars/angular-ui-bootstrap/ui-bootstrap-tpls.min.js"></script>
+<script type="text/javascript" src="/webjars/sockjs-client/sockjs.min.js"></script>
+<script type="text/javascript" src="/webjars/stomp-websocket/lib/stomp.min.js"></script>
+<script type="text/javascript" src="/webjars/ng-stomp/dist/ng-stomp.min.js"></script>
+
+<script type="text/javascript" src="/app/app.js"></script>
+<script type="text/javascript" src="/app/services.js"></script>
+<script type="text/javascript" src="/app/controllers.js"></script>
+
+</body>
+</html>

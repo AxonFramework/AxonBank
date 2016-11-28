@@ -1,0 +1,31 @@
+<div>
+    <div class="modal-header">
+        <button ng-click="close()" type="button" class="close" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title" id="modal-title">Bank Transfers</h3>
+    </div>
+    <div class="modal-body" id="modal-body">
+        <table class="table table-striped table-bordered table-condensed">
+            <thead>
+            <tr>
+                <th>Source</th>
+                <th>Destination</th>
+                <th>Amount</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="bankTransfer in bankTransfers">
+                <td>{{bankTransfer.sourceBankAccountId != bankAccountId ? bankTransfer.sourceBankAccountId : ''}}</td>
+                <td>{{bankTransfer.destinationBankAccountId != bankAccountId ? bankTransfer.destinationBankAccountId: ''}}</td>
+                <td>{{bankTransfer.amount}}</td>
+                <td>{{bankTransfer.status}}</td>
+            </tr>
+            <tr ng-if="bankTransfers.length == 0">
+                <td colspan="4">This bank account does not have any bank transfers</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
