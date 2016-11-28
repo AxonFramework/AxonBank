@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.axonframework.samples.bank.query.banktransfer;
+package org.axonframework.samples.bank.web.dto;
 
-import org.springframework.data.repository.CrudRepository;
+import lombok.Value;
 
-public interface BankTransferRepository extends CrudRepository<BankTransferEntry, String> {
+@Value
+public class BankAccountDto {
 
-    Iterable<BankTransferEntry> findBySourceBankAccountIdOrDestinationBankAccountId(String sourceBankAccountId,
-                                                                                    String destinationBankAccountId);
+    private long overdraftLimit;
 }
