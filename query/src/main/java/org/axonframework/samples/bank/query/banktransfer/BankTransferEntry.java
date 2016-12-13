@@ -17,13 +17,16 @@
 package org.axonframework.samples.bank.query.banktransfer;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
 public class BankTransferEntry {
 
     @Id
-    private String id;
+    @GeneratedValue
+    private long id;
+    private String axonBankTransferId;
     private String sourceBankAccountId;
     private String destinationBankAccountId;
     private long amount;
@@ -33,20 +36,20 @@ public class BankTransferEntry {
     public BankTransferEntry() {
     }
 
-    public BankTransferEntry(String id, String sourceBankAccountId, String destinationBankAccountId, long amount) {
-        this.id = id;
+    public BankTransferEntry(String axonBankTransferId, String sourceBankAccountId, String destinationBankAccountId, long amount) {
+        this.axonBankTransferId = axonBankTransferId;
         this.sourceBankAccountId = sourceBankAccountId;
         this.destinationBankAccountId = destinationBankAccountId;
         this.amount = amount;
         this.status = Status.STARTED;
     }
 
-    public String getId() {
-        return id;
+    public String getAxonBankTransferId() {
+        return axonBankTransferId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setAxonBankTransferId(String axonBankTransferId) {
+        this.axonBankTransferId = axonBankTransferId;
     }
 
     public String getSourceBankAccountId() {

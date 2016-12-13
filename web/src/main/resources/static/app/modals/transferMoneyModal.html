@@ -11,9 +11,9 @@
                 <label for="destinationBankAccount">Destination Bank Account</label>
                 <select ng-model="bankTransfer.destinationBankAccountId" class="form-control" name="destinationBankAccount"
                         id="destinationBankAccount">
-                    <option ng-if="bankTransfer.sourceBankAccountId != bankAccount.id"
-                            ng-repeat="bankAccount in bankAccounts" value="{{bankAccount.id}}">
-                        {{bankAccount.id}}
+                    <option ng-if="bankTransfer.sourceBankAccountId != bankAccount.axonBankAccountId"
+                            ng-repeat="bankAccount in bankAccounts" value="{{bankAccount.axonBankAccountId}}">
+                        {{bankAccount.axonBankAccountId}}
                     </option>
                 </select>
             </div>

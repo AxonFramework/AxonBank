@@ -43,7 +43,7 @@ public class BankTransferEventListener {
 
     @EventHandler
     public void on(BankTransferFailedEvent event) {
-        BankTransferEntry bankTransferEntry = repository.findOne(event.getBankTransferId());
+        BankTransferEntry bankTransferEntry = repository.findOneByAxonBankTransferId(event.getBankTransferId());
         bankTransferEntry.setStatus(BankTransferEntry.Status.FAILED);
 
         repository.save(bankTransferEntry);
@@ -51,7 +51,7 @@ public class BankTransferEventListener {
 
     @EventHandler
     public void on(BankTransferCompletedEvent event) {
-        BankTransferEntry bankTransferEntry = repository.findOne(event.getBankTransferId());
+        BankTransferEntry bankTransferEntry = repository.findOneByAxonBankTransferId(event.getBankTransferId());
         bankTransferEntry.setStatus(BankTransferEntry.Status.COMPLETED);
 
         repository.save(bankTransferEntry);

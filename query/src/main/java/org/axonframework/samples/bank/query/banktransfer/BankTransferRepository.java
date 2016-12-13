@@ -20,6 +20,7 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface BankTransferRepository extends CrudRepository<BankTransferEntry, String> {
 
+    BankTransferEntry findOneByAxonBankTransferId(String axonBankTransferId);
     Iterable<BankTransferEntry> findBySourceBankAccountIdOrDestinationBankAccountId(String sourceBankAccountId,
                                                                                     String destinationBankAccountId);
 }

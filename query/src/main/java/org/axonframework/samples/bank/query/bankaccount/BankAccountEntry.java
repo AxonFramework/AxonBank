@@ -17,13 +17,16 @@
 package org.axonframework.samples.bank.query.bankaccount;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
 public class BankAccountEntry {
 
     @Id
-    private String id;
+    @GeneratedValue
+    private long id;
+    private String axonBankAccountId;
     private long balance;
     private long overdraftLimit;
 
@@ -31,18 +34,26 @@ public class BankAccountEntry {
     public BankAccountEntry() {
     }
 
-    public BankAccountEntry(String id, long balance, long overdraftLimit) {
-        this.id = id;
+    public BankAccountEntry(String axonBankAccountId, long balance, long overdraftLimit) {
+        this.axonBankAccountId = axonBankAccountId;
         this.balance = balance;
         this.overdraftLimit = overdraftLimit;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
+    }
+
+    public String getAxonBankAccountId() {
+        return axonBankAccountId;
+    }
+
+    public void setAxonBankAccountId(String axonBankAccountId) {
+        this.axonBankAccountId = axonBankAccountId;
     }
 
     public long getBalance() {

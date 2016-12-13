@@ -44,23 +44,23 @@
             </thead>
             <tbody>
             <tr ng-repeat="bankAccount in bankAccounts">
-                <td>{{bankAccount.id}}</td>
+                <td>{{bankAccount.axonBankAccountId}}</td>
                 <td>{{bankAccount.balance}}</td>
                 <td>{{bankAccount.overdraftLimit}}</td>
                 <td>
-                    <button ng-click="deposit(bankAccount.id)" class="btn btn-sm btn-primary" type="submit">
+                    <button ng-click="deposit(bankAccount.axonBankAccountId)" class="btn btn-sm btn-primary" type="submit">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                         Deposit
                     </button>
-                    <button ng-click="withdraw(bankAccount.id)" class="btn btn-sm btn-success" type="submit">
+                    <button ng-click="withdraw(bankAccount.axonBankAccountId)" class="btn btn-sm btn-success" type="submit">
                         <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
                         Withdraw
                     </button>
-                    <button ng-click="transfer(bankAccount.id)" class="btn btn-sm btn-info" type="submit">
+                    <button ng-click="transfer(bankAccount.axonBankAccountId)" class="btn btn-sm btn-info" type="submit">
                         <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
                         Transfer
                     </button>
-                    <button ng-click="bankTransfers(bankAccount.id)" class="btn btn-sm btn-warning" type="submit">
+                    <button ng-click="bankTransfers(bankAccount.axonBankAccountId)" class="btn btn-sm btn-warning" type="submit">
                         <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                         Bank Transfers
                     </button>

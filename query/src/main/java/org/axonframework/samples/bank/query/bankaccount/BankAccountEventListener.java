@@ -45,7 +45,7 @@ public class BankAccountEventListener {
 
     @EventHandler
     public void on(MoneyAddedEvent event) {
-        BankAccountEntry bankAccountEntry = repository.findOne(event.getBankAccountId());
+        BankAccountEntry bankAccountEntry = repository.findOneByAxonBankAccountId(event.getBankAccountId());
         bankAccountEntry.setBalance(bankAccountEntry.getBalance() + event.getAmount());
 
         repository.save(bankAccountEntry);
@@ -55,7 +55,7 @@ public class BankAccountEventListener {
 
     @EventHandler
     public void on(MoneySubtractedEvent event) {
-        BankAccountEntry bankAccountEntry = repository.findOne(event.getBankAccountId());
+        BankAccountEntry bankAccountEntry = repository.findOneByAxonBankAccountId(event.getBankAccountId());
         bankAccountEntry.setBalance(bankAccountEntry.getBalance() - event.getAmount());
 
         repository.save(bankAccountEntry);
