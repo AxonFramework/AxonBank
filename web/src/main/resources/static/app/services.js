@@ -39,7 +39,7 @@ angular.module('axonBank')
             },
             subscribeToBankAccountUpdates: function () {
                 var deferred = $q.defer();
-                $stomp.subscribe('/topic/bank-accounts/updates', function (data) {
+                $stomp.subscribe('/topic/bank-accounts.updates', function (data) {
                     deferred.notify(data);
                 });
                 return deferred.promise;

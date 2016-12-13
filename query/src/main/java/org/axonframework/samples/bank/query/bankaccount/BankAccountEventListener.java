@@ -65,7 +65,7 @@ public class BankAccountEventListener {
 
     private void broadcastUpdates() {
         Iterable<BankAccountEntry> bankAccountEntries = repository.findAll();
-        messagingTemplate.convertAndSend("/topic/bank-accounts/updates", bankAccountEntries);
+        messagingTemplate.convertAndSend("/topic/bank-accounts.updates", bankAccountEntries);
     }
 
 }
