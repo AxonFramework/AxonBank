@@ -18,6 +18,8 @@ package org.axonframework.samples.bank.config;
 
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.SimpleCommandBus;
+import org.axonframework.eventhandling.saga.repository.SagaStore;
+import org.axonframework.eventhandling.saga.repository.inmemory.InMemorySagaStore;
 import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
 import org.axonframework.eventsourcing.eventstore.inmemory.InMemoryEventStorageEngine;
 import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
@@ -37,8 +39,17 @@ public class SingleNodeConfig {
         return simpleCommandBus;
     }
 
+    // We're using Axon Framework's Spring Boot support therefore Axon Framework will create JpaEventStorageEngine and
+    // JpaSagaStore beans if EntityManagerFactory is on the classpath. EntityManagerFactory is on the classpath, because
+    // we're using JPA for the query side of Axon Bank. In order to use InMemoryEventStorageEngine and InMemorySagaStore
+    // we need to create the beans ourselves.
     @Bean
     public EventStorageEngine eventStorageEngine() {
         return new InMemoryEventStorageEngine();
+    }
+
+    @Bean
+    public SagaStore sagaStore() {
+        return new InMemorySagaStore();
     }
 }

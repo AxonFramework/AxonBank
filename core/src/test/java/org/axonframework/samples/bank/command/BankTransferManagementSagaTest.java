@@ -37,9 +37,9 @@ public class BankTransferManagementSagaTest {
                                                                                          destinationBankAccountId,
                                                                                          amountOfMoneyToTransfer))
                    .expectActiveSagas(1)
-                   .expectDispatchedCommandsEqualTo(new DebitSourceBankAccountCommand(sourceBankAccountId,
-                                                                                      bankTransferId,
-                                                                                      amountOfMoneyToTransfer));
+                   .expectDispatchedCommands(new DebitSourceBankAccountCommand(sourceBankAccountId,
+                                                                               bankTransferId,
+                                                                               amountOfMoneyToTransfer));
     }
 
     @Test
@@ -55,7 +55,7 @@ public class BankTransferManagementSagaTest {
                                                                                           amountOfMoneyToTransfer))
                    .whenPublishingA(new SourceBankAccountNotFoundEvent(bankTransferId))
                    .expectActiveSagas(0)
-                   .expectDispatchedCommandsEqualTo(new MarkBankTransferFailedCommand(bankTransferId));
+                   .expectDispatchedCommands(new MarkBankTransferFailedCommand(bankTransferId));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class BankTransferManagementSagaTest {
                    .whenAggregate(sourceBankAccountId)
                    .publishes(new SourceBankAccountDebitRejectedEvent(bankTransferId))
                    .expectActiveSagas(0)
-                   .expectDispatchedCommandsEqualTo(new MarkBankTransferFailedCommand(bankTransferId));
+                   .expectDispatchedCommands(new MarkBankTransferFailedCommand(bankTransferId));
     }
 
     @Test
@@ -90,9 +90,9 @@ public class BankTransferManagementSagaTest {
                                                                                                    amountOfMoneyToTransfer,
                                                                                                    bankTransferId))
                    .expectActiveSagas(1)
-                   .expectDispatchedCommandsEqualTo(new CreditDestinationBankAccountCommand(destinationBankAccountId,
-                                                                                            bankTransferId,
-                                                                                            amountOfMoneyToTransfer));
+                   .expectDispatchedCommands(new CreditDestinationBankAccountCommand(destinationBankAccountId,
+                                                                                     bankTransferId,
+                                                                                     amountOfMoneyToTransfer));
     }
 
     @Test
@@ -110,9 +110,9 @@ public class BankTransferManagementSagaTest {
                 sourceBankAccountId, amountOfMoneyToTransfer, bankTransferId))
                    .whenPublishingA(new DestinationBankAccountNotFoundEvent(bankTransferId))
                    .expectActiveSagas(0)
-                   .expectDispatchedCommandsEqualTo(new ReturnMoneyOfFailedBankTransferCommand(sourceBankAccountId,
-                                                                                               amountOfMoneyToTransfer),
-                                                    new MarkBankTransferFailedCommand(bankTransferId));
+                   .expectDispatchedCommands(new ReturnMoneyOfFailedBankTransferCommand(sourceBankAccountId,
+                                                                                        amountOfMoneyToTransfer),
+                                             new MarkBankTransferFailedCommand(bankTransferId));
     }
 
     @Test
@@ -135,6 +135,6 @@ public class BankTransferManagementSagaTest {
                 amountOfMoneyToTransfer,
                 bankTransferId))
                    .expectActiveSagas(0)
-                   .expectDispatchedCommandsEqualTo(new MarkBankTransferCompletedCommand(bankTransferId));
+                   .expectDispatchedCommands(new MarkBankTransferCompletedCommand(bankTransferId));
     }
 }

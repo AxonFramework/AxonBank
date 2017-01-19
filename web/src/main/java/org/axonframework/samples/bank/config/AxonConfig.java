@@ -36,5 +36,4 @@ public class AxonConfig {
     public BankAccountCommandHandler bankAccountCommandHandler() {
         return new BankAccountCommandHandler(axonConfiguration.repository(BankAccount.class), eventBus);
     }
-
 }
