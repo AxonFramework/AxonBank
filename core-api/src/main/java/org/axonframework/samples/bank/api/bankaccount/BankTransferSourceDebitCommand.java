@@ -20,7 +20,7 @@ import lombok.Value;
 import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
 @Value
-public class DebitSourceBankAccountCommand {
+public class BankTransferSourceDebitCommand {
 
     @TargetAggregateIdentifier
     private String bankAccountId;

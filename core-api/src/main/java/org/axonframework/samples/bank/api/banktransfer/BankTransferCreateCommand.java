@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package org.axonframework.samples.bank.api.bankaccount;
+package org.axonframework.samples.bank.api.banktransfer;
 
 import lombok.Value;
-import lombok.experimental.NonFinal;
+import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
 @Value
-@NonFinal
-public abstract class MoneyAddedEvent {
+public class BankTransferCreateCommand {
 
-    private String bankAccountId;
+    @TargetAggregateIdentifier
+    private String bankTransferId;
+    private String sourceBankAccountId;
+    private String destinationBankAccountId;
     private long amount;
 }

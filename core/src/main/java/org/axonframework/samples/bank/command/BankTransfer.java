@@ -22,9 +22,9 @@ import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.samples.bank.api.banktransfer.BankTransferCompletedEvent;
 import org.axonframework.samples.bank.api.banktransfer.BankTransferCreatedEvent;
 import org.axonframework.samples.bank.api.banktransfer.BankTransferFailedEvent;
-import org.axonframework.samples.bank.api.banktransfer.CreateBankTransferCommand;
-import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferCompletedCommand;
-import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferFailedCommand;
+import org.axonframework.samples.bank.api.banktransfer.BankTransferCreateCommand;
+import org.axonframework.samples.bank.api.banktransfer.BankTransferMarkCompletedCommand;
+import org.axonframework.samples.bank.api.banktransfer.BankTransferMarkFailedCommand;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
@@ -44,7 +44,7 @@ public class BankTransfer {
     }
 
     @CommandHandler
-    public BankTransfer(CreateBankTransferCommand command) {
+    public BankTransfer(BankTransferCreateCommand command) {
         apply(new BankTransferCreatedEvent(command.getBankTransferId(),
                                            command.getSourceBankAccountId(),
                                            command.getDestinationBankAccountId(),
@@ -52,12 +52,12 @@ public class BankTransfer {
     }
 
     @CommandHandler
-    public void handle(MarkBankTransferCompletedCommand command) {
+    public void handle(BankTransferMarkCompletedCommand command) {
         apply(new BankTransferCompletedEvent(command.getBankTransferId()));
     }
 
     @CommandHandler
-    public void handle(MarkBankTransferFailedCommand command) {
+    public void handle(BankTransferMarkFailedCommand command) {
         apply(new BankTransferFailedEvent(command.getBankTransferId()));
     }
 

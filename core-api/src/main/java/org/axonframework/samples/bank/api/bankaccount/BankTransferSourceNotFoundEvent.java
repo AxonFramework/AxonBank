@@ -19,7 +19,7 @@ package org.axonframework.samples.bank.api.bankaccount;
 import lombok.Value;
 
 @Value
-public class SourceBankAccountNotFoundEvent {
+public class BankTransferSourceNotFoundEvent {
 
     private String bankTransferId;
 }

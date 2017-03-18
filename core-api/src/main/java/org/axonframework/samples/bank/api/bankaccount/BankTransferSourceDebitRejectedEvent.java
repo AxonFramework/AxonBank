@@ -16,9 +16,10 @@
 
 package org.axonframework.samples.bank.api.bankaccount;
 
-public class MoneyWithdrawnEvent extends MoneySubtractedEvent {
+import lombok.Value;
 
-    public MoneyWithdrawnEvent(String bankAccountId, long amountOfMoney) {
-        super(bankAccountId, amountOfMoney);
-    }
+@Value
+public class BankTransferSourceDebitRejectedEvent {
+
+    private String BankTransferId;
 }

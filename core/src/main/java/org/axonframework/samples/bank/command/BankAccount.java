@@ -19,14 +19,14 @@ package org.axonframework.samples.bank.command;
 import org.axonframework.commandhandling.model.AggregateIdentifier;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.samples.bank.api.bankaccount.BankAccountCreatedEvent;
-import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountCreditedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneyAddedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneyDepositedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneyOfFailedBankTransferReturnedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneySubtractedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneyWithdrawnEvent;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitRejectedEvent;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferDestinationCreditedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankAccountMoneyAddedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankAccountMoneyDepositedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceReturnedMoneyOfFailedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankAccountMoneySubtractedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankAccountMoneyWithdrawnEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceDebitRejectedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceDebitedEvent;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
@@ -48,30 +48,30 @@ public class BankAccount {
     }
 
     public void deposit(long amount) {
-        apply(new MoneyDepositedEvent(id, amount));
+        apply(new BankAccountMoneyDepositedEvent(id, amount));
     }
 
     public void withdraw(long amount) {
         if (amount <= balanceInCents + overdraftLimit) {
-            apply(new MoneyWithdrawnEvent(id, amount));
+            apply(new BankAccountMoneyWithdrawnEvent(id, amount));
         }
     }
 
     public void debit(long amount, String bankTransferId) {
         if (amount <= balanceInCents + overdraftLimit) {
-            apply(new SourceBankAccountDebitedEvent(id, amount, bankTransferId));
+            apply(new BankTransferSourceDebitedEvent(id, amount, bankTransferId));
         }
         else {
-            apply(new SourceBankAccountDebitRejectedEvent(bankTransferId));
+            apply(new BankTransferSourceDebitRejectedEvent(bankTransferId));
         }
     }
 
     public void credit(long amount, String bankTransferId) {
-        apply(new DestinationBankAccountCreditedEvent(id, amount, bankTransferId));
+        apply(new BankTransferDestinationCreditedEvent(id, amount, bankTransferId));
     }
 
     public void returnMoney(long amount) {
-        apply(new MoneyOfFailedBankTransferReturnedEvent(id, amount));
+        apply(new BankTransferSourceReturnedMoneyOfFailedEvent(id, amount));
     }
 
     @EventHandler
@@ -82,12 +82,12 @@ public class BankAccount {
     }
 
     @EventHandler
-    public void on(MoneyAddedEvent event) {
+    public void on(BankAccountMoneyAddedEvent event) {
         balanceInCents += event.getAmount();
     }
 
     @EventHandler
-    public void on(MoneySubtractedEvent event) {
+    public void on(BankAccountMoneySubtractedEvent event) {
         balanceInCents -= event.getAmount();
     }
 }

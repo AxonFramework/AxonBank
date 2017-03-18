@@ -19,11 +19,11 @@ package org.axonframework.samples.bank.command;
 import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
 import org.axonframework.messaging.interceptors.JSR303ViolationException;
 import org.axonframework.samples.bank.api.bankaccount.BankAccountCreatedEvent;
-import org.axonframework.samples.bank.api.bankaccount.CreateBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.DepositMoneyCommand;
-import org.axonframework.samples.bank.api.bankaccount.MoneyDepositedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneyWithdrawnEvent;
-import org.axonframework.samples.bank.api.bankaccount.WithdrawMoneyCommand;
+import org.axonframework.samples.bank.api.bankaccount.BankAccountCreateCommand;
+import org.axonframework.samples.bank.api.bankaccount.BankAccountMoneyDepositCommand;
+import org.axonframework.samples.bank.api.bankaccount.BankAccountMoneyDepositedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankAccountMoneyWithdrawnEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankAccountWithdrawMoneyCommand;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.*;
@@ -46,7 +46,7 @@ public class BankAccountCommandHandlerTest {
     @Test(expected = JSR303ViolationException.class)
     public void testCreateBankAccount_RejectNegativeOverdraft() throws Exception {
         testFixture.givenNoPriorActivity()
-                   .when(new CreateBankAccountCommand(UUID.randomUUID().toString(), -1000));
+                   .when(new BankAccountCreateCommand(UUID.randomUUID().toString(), -1000));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class BankAccountCommandHandlerTest {
         String id = "bankAccountId";
 
         testFixture.givenNoPriorActivity()
-                   .when(new CreateBankAccountCommand(id, 0))
+                   .when(new BankAccountCreateCommand(id, 0))
                    .expectEvents(new BankAccountCreatedEvent(id, 0));
     }
 
@@ -63,25 +63,25 @@ public class BankAccountCommandHandlerTest {
         String id = "bankAccountId";
 
         testFixture.given(new BankAccountCreatedEvent(id, 0))
-                   .when(new DepositMoneyCommand(id, 1000))
-                   .expectEvents(new MoneyDepositedEvent(id, 1000));
+                   .when(new BankAccountMoneyDepositCommand(id, 1000))
+                   .expectEvents(new BankAccountMoneyDepositedEvent(id, 1000));
     }
 
     @Test
     public void testWithdrawMoney() throws Exception {
         String id = "bankAccountId";
 
-        testFixture.given(new BankAccountCreatedEvent(id, 0), new MoneyDepositedEvent(id, 50))
-                   .when(new WithdrawMoneyCommand(id, 50))
-                   .expectEvents(new MoneyWithdrawnEvent(id, 50));
+        testFixture.given(new BankAccountCreatedEvent(id, 0), new BankAccountMoneyDepositedEvent(id, 50))
+                   .when(new BankAccountWithdrawMoneyCommand(id, 50))
+                   .expectEvents(new BankAccountMoneyWithdrawnEvent(id, 50));
     }
 
     @Test
     public void testWithdrawMoney_RejectWithdrawal() throws Exception {
         String id = "bankAccountId";
 
-        testFixture.given(new BankAccountCreatedEvent(id, 0), new MoneyDepositedEvent(id, 50))
-                   .when(new WithdrawMoneyCommand(id, 51))
+        testFixture.given(new BankAccountCreatedEvent(id, 0), new BankAccountMoneyDepositedEvent(id, 50))
+                   .when(new BankAccountWithdrawMoneyCommand(id, 51))
                    .expectEvents();
     }
 }

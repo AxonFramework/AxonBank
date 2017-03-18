@@ -18,8 +18,8 @@ package org.axonframework.samples.bank.query.bankaccount;
 
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.samples.bank.api.bankaccount.BankAccountCreatedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneyAddedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneySubtractedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankAccountMoneyAddedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankAccountMoneySubtractedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Component;
@@ -44,7 +44,7 @@ public class BankAccountEventListener {
     }
 
     @EventHandler
-    public void on(MoneyAddedEvent event) {
+    public void on(BankAccountMoneyAddedEvent event) {
         BankAccountEntry bankAccountEntry = repository.findOneByAxonBankAccountId(event.getBankAccountId());
         bankAccountEntry.setBalance(bankAccountEntry.getBalance() + event.getAmount());
 
@@ -54,7 +54,7 @@ public class BankAccountEventListener {
     }
 
     @EventHandler
-    public void on(MoneySubtractedEvent event) {
+    public void on(BankAccountMoneySubtractedEvent event) {
         BankAccountEntry bankAccountEntry = repository.findOneByAxonBankAccountId(event.getBankAccountId());
         bankAccountEntry.setBalance(bankAccountEntry.getBalance() - event.getAmount());
 
