@@ -18,7 +18,7 @@ package org.axonframework.samples.bank.web;
 
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.GenericCommandMessage;
-import org.axonframework.samples.bank.api.banktransfer.CreateBankTransferCommand;
+import org.axonframework.samples.bank.api.banktransfer.BankTransferCreateCommand;
 import org.axonframework.samples.bank.query.banktransfer.BankTransferEntry;
 import org.axonframework.samples.bank.query.banktransfer.BankTransferRepository;
 import org.axonframework.samples.bank.web.dto.BankTransferDto;
@@ -58,7 +58,7 @@ public class BankTransferController {
     @MessageMapping("/bank-transfers/create")
     public void create(BankTransferDto bankTransferDto) {
         String bankTransferId = UUID.randomUUID().toString();
-        CreateBankTransferCommand command = new CreateBankTransferCommand(bankTransferId,
+        BankTransferCreateCommand command = new BankTransferCreateCommand(bankTransferId,
                                                                           bankTransferDto.getSourceBankAccountId(),
                                                                           bankTransferDto.getDestinationBankAccountId(),
                                                                           bankTransferDto.getAmount());

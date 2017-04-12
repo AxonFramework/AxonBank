@@ -17,12 +17,13 @@
 package org.axonframework.samples.bank.api.bankaccount;
 
 import lombok.Value;
-import lombok.experimental.NonFinal;
+import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
 @Value
-@NonFinal
-public abstract class MoneySubtractedEvent {
+public class BankTransferDestinationCreditCommand {
 
+    @TargetAggregateIdentifier
     private String bankAccountId;
+    private String bankTransferId;
     private long amount;
 }

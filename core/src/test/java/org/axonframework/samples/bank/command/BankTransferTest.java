@@ -19,9 +19,9 @@ package org.axonframework.samples.bank.command;
 import org.axonframework.samples.bank.api.banktransfer.BankTransferCompletedEvent;
 import org.axonframework.samples.bank.api.banktransfer.BankTransferCreatedEvent;
 import org.axonframework.samples.bank.api.banktransfer.BankTransferFailedEvent;
-import org.axonframework.samples.bank.api.banktransfer.CreateBankTransferCommand;
-import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferCompletedCommand;
-import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferFailedCommand;
+import org.axonframework.samples.bank.api.banktransfer.BankTransferCreateCommand;
+import org.axonframework.samples.bank.api.banktransfer.BankTransferMarkCompletedCommand;
+import org.axonframework.samples.bank.api.banktransfer.BankTransferMarkFailedCommand;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.*;
@@ -42,7 +42,7 @@ public class BankTransferTest {
         String destinationBankAccountId = "destinationBankAccountId";
 
         fixture.givenNoPriorActivity()
-               .when(new CreateBankTransferCommand(bankTransferId, sourceBankAccountId, destinationBankAccountId, 20))
+               .when(new BankTransferCreateCommand(bankTransferId, sourceBankAccountId, destinationBankAccountId, 20))
                .expectEvents(new BankTransferCreatedEvent(bankTransferId,
                                                           sourceBankAccountId,
                                                           destinationBankAccountId,
@@ -56,7 +56,7 @@ public class BankTransferTest {
         String destinationBankAccountId = "destinationBankAccountId";
 
         fixture.given(new BankTransferCreatedEvent(bankTransferId, sourceBankAccountId, destinationBankAccountId, 20))
-               .when(new MarkBankTransferCompletedCommand(bankTransferId))
+               .when(new BankTransferMarkCompletedCommand(bankTransferId))
                .expectEvents(new BankTransferCompletedEvent(bankTransferId));
     }
 
@@ -67,7 +67,7 @@ public class BankTransferTest {
         String destinationBankAccountId = "destinationBankAccountId";
 
         fixture.given(new BankTransferCreatedEvent(bankTransferId, sourceBankAccountId, destinationBankAccountId, 20))
-               .when(new MarkBankTransferFailedCommand(bankTransferId))
+               .when(new BankTransferMarkFailedCommand(bankTransferId))
                .expectEvents(new BankTransferFailedEvent(bankTransferId));
     }
 }

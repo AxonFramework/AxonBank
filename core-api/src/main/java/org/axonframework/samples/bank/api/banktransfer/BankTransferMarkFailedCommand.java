@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package org.axonframework.samples.bank.api.bankaccount;
+package org.axonframework.samples.bank.api.banktransfer;
 
 import lombok.Value;
+import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
 @Value
-public class DestinationBankAccountNotFoundEvent {
+public class BankTransferMarkFailedCommand {
 
+    @TargetAggregateIdentifier
     private String bankTransferId;
 }

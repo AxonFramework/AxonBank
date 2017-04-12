@@ -19,12 +19,12 @@ package org.axonframework.samples.bank.api.bankaccount;
 import lombok.Getter;
 
 @Getter
-public class SourceBankAccountDebitedEvent extends MoneySubtractedEvent {
+public class BankTransferDestinationCreditedEvent extends BankAccountMoneyAddedEvent {
 
     private String bankTransferId;
 
-    public SourceBankAccountDebitedEvent(String id, long amountOfMoney, String bankTransferId) {
-        super(id, amountOfMoney);
+    public BankTransferDestinationCreditedEvent(String id, long amount, String bankTransferId) {
+        super(id, amount);
 
         this.bankTransferId = bankTransferId;
     }

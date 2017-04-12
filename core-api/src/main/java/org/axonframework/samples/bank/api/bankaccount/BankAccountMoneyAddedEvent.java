@@ -16,9 +16,13 @@
 
 package org.axonframework.samples.bank.api.bankaccount;
 
-public class MoneyOfFailedBankTransferReturnedEvent extends MoneyAddedEvent {
+import lombok.Value;
+import lombok.experimental.NonFinal;
 
-    public MoneyOfFailedBankTransferReturnedEvent(String bankAccountId, long amountOfMoneyDeposited) {
-        super(bankAccountId, amountOfMoneyDeposited);
-    }
+@Value
+@NonFinal
+public abstract class BankAccountMoneyAddedEvent {
+
+    private String bankAccountId;
+    private long amount;
 }

@@ -20,17 +20,17 @@ import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.eventhandling.saga.EndSaga;
 import org.axonframework.eventhandling.saga.SagaEventHandler;
 import org.axonframework.eventhandling.saga.StartSaga;
-import org.axonframework.samples.bank.api.bankaccount.CreditDestinationBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.DebitSourceBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountCreditedEvent;
-import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountNotFoundEvent;
-import org.axonframework.samples.bank.api.bankaccount.ReturnMoneyOfFailedBankTransferCommand;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitRejectedEvent;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitedEvent;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountNotFoundEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferDestinationCreditCommand;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceDebitCommand;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferDestinationCreditedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferDestinationNotFoundEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceReturnMoneyCommand;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceDebitRejectedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceDebitedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceNotFoundEvent;
 import org.axonframework.samples.bank.api.banktransfer.BankTransferCreatedEvent;
-import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferCompletedCommand;
-import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferFailedCommand;
+import org.axonframework.samples.bank.api.banktransfer.BankTransferMarkCompletedCommand;
+import org.axonframework.samples.bank.api.banktransfer.BankTransferMarkFailedCommand;
 import org.axonframework.spring.stereotype.Saga;
 
 import javax.inject.Inject;
@@ -58,7 +58,7 @@ public class BankTransferManagementSaga {
         this.destinationBankAccountId = event.getDestinationBankAccountId();
         this.amount = event.getAmount();
 
-        DebitSourceBankAccountCommand command = new DebitSourceBankAccountCommand(event.getSourceBankAccountId(),
+        BankTransferSourceDebitCommand command = new BankTransferSourceDebitCommand(event.getSourceBankAccountId(),
                                                                                   event.getBankTransferId(),
                                                                                   event.getAmount());
         commandBus.dispatch(asCommandMessage(command));
@@ -66,21 +66,21 @@ public class BankTransferManagementSaga {
 
     @SagaEventHandler(associationProperty = "bankTransferId")
     @EndSaga
-    public void on(SourceBankAccountNotFoundEvent event) {
-        MarkBankTransferFailedCommand markFailedCommand = new MarkBankTransferFailedCommand(event.getBankTransferId());
+    public void on(BankTransferSourceNotFoundEvent event) {
+        BankTransferMarkFailedCommand markFailedCommand = new BankTransferMarkFailedCommand(event.getBankTransferId());
         commandBus.dispatch(asCommandMessage(markFailedCommand));
     }
 
     @SagaEventHandler(associationProperty = "bankTransferId")
     @EndSaga
-    public void on(SourceBankAccountDebitRejectedEvent event) {
-        MarkBankTransferFailedCommand markFailedCommand = new MarkBankTransferFailedCommand(event.getBankTransferId());
+    public void on(BankTransferSourceDebitRejectedEvent event) {
+        BankTransferMarkFailedCommand markFailedCommand = new BankTransferMarkFailedCommand(event.getBankTransferId());
         commandBus.dispatch(asCommandMessage(markFailedCommand));
     }
 
     @SagaEventHandler(associationProperty = "bankTransferId")
-    public void on(SourceBankAccountDebitedEvent event) {
-        CreditDestinationBankAccountCommand command = new CreditDestinationBankAccountCommand(destinationBankAccountId,
+    public void on(BankTransferSourceDebitedEvent event) {
+        BankTransferDestinationCreditCommand command = new BankTransferDestinationCreditCommand(destinationBankAccountId,
                                                                                               event.getBankTransferId(),
                                                                                               event.getAmount());
         commandBus.dispatch(asCommandMessage(command));
@@ -88,21 +88,21 @@ public class BankTransferManagementSaga {
 
     @SagaEventHandler(associationProperty = "bankTransferId")
     @EndSaga
-    public void on(DestinationBankAccountNotFoundEvent event) {
-        ReturnMoneyOfFailedBankTransferCommand returnMoneyCommand = new ReturnMoneyOfFailedBankTransferCommand(
+    public void on(BankTransferDestinationNotFoundEvent event) {
+        BankTransferSourceReturnMoneyCommand returnMoneyCommand = new BankTransferSourceReturnMoneyCommand(
                 sourceBankAccountId,
                 amount);
         commandBus.dispatch(asCommandMessage(returnMoneyCommand));
 
-        MarkBankTransferFailedCommand markFailedCommand = new MarkBankTransferFailedCommand(
+        BankTransferMarkFailedCommand markFailedCommand = new BankTransferMarkFailedCommand(
                 event.getBankTransferId());
         commandBus.dispatch(asCommandMessage(markFailedCommand));
     }
 
     @EndSaga
     @SagaEventHandler(associationProperty = "bankTransferId")
-    public void on(DestinationBankAccountCreditedEvent event) {
-        MarkBankTransferCompletedCommand command = new MarkBankTransferCompletedCommand(event.getBankTransferId());
+    public void on(BankTransferDestinationCreditedEvent event) {
+        BankTransferMarkCompletedCommand command = new BankTransferMarkCompletedCommand(event.getBankTransferId());
         commandBus.dispatch(asCommandMessage(command));
     }
 }

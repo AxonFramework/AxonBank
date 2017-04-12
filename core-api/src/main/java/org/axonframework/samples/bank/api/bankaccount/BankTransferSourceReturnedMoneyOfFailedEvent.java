@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package org.axonframework.samples.bank.api.banktransfer;
+package org.axonframework.samples.bank.api.bankaccount;
 
-import lombok.Value;
-import org.axonframework.commandhandling.TargetAggregateIdentifier;
+public class BankTransferSourceReturnedMoneyOfFailedEvent extends BankAccountMoneyAddedEvent {
 
-@Value
-public class MarkBankTransferCompletedCommand {
-
-    @TargetAggregateIdentifier
-    private String bankTransferId;
+    public BankTransferSourceReturnedMoneyOfFailedEvent(String bankAccountId, long amountOfMoneyDeposited) {
+        super(bankAccountId, amountOfMoneyDeposited);
+    }
 }

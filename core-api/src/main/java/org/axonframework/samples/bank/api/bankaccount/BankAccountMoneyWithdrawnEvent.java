@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package org.axonframework.samples.bank.api.banktransfer;
+package org.axonframework.samples.bank.api.bankaccount;
 
-import lombok.Value;
-import org.axonframework.commandhandling.TargetAggregateIdentifier;
+public class BankAccountMoneyWithdrawnEvent extends BankAccountMoneySubtractedEvent {
 
-@Value
-public class CreateBankTransferCommand {
-
-    @TargetAggregateIdentifier
-    private String bankTransferId;
-    private String sourceBankAccountId;
-    private String destinationBankAccountId;
-    private long amount;
+    public BankAccountMoneyWithdrawnEvent(String bankAccountId, long amountOfMoney) {
+        super(bankAccountId, amountOfMoney);
+    }
 }

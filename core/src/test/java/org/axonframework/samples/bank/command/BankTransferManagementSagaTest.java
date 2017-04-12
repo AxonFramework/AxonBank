@@ -1,16 +1,16 @@
 package org.axonframework.samples.bank.command;
 
-import org.axonframework.samples.bank.api.bankaccount.CreditDestinationBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.DebitSourceBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountCreditedEvent;
-import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountNotFoundEvent;
-import org.axonframework.samples.bank.api.bankaccount.ReturnMoneyOfFailedBankTransferCommand;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitRejectedEvent;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitedEvent;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountNotFoundEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferDestinationCreditCommand;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceDebitCommand;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferDestinationCreditedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferDestinationNotFoundEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceReturnMoneyCommand;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceDebitRejectedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceDebitedEvent;
+import org.axonframework.samples.bank.api.bankaccount.BankTransferSourceNotFoundEvent;
 import org.axonframework.samples.bank.api.banktransfer.BankTransferCreatedEvent;
-import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferCompletedCommand;
-import org.axonframework.samples.bank.api.banktransfer.MarkBankTransferFailedCommand;
+import org.axonframework.samples.bank.api.banktransfer.BankTransferMarkCompletedCommand;
+import org.axonframework.samples.bank.api.banktransfer.BankTransferMarkFailedCommand;
 import org.axonframework.test.saga.FixtureConfiguration;
 import org.axonframework.test.saga.SagaTestFixture;
 import org.junit.*;
@@ -37,7 +37,7 @@ public class BankTransferManagementSagaTest {
                                                                                          destinationBankAccountId,
                                                                                          amountOfMoneyToTransfer))
                    .expectActiveSagas(1)
-                   .expectDispatchedCommands(new DebitSourceBankAccountCommand(sourceBankAccountId,
+                   .expectDispatchedCommands(new BankTransferSourceDebitCommand(sourceBankAccountId,
                                                                                bankTransferId,
                                                                                amountOfMoneyToTransfer));
     }
@@ -53,9 +53,9 @@ public class BankTransferManagementSagaTest {
                                                                                           sourceBankAccountId,
                                                                                           destinationBankAccountId,
                                                                                           amountOfMoneyToTransfer))
-                   .whenPublishingA(new SourceBankAccountNotFoundEvent(bankTransferId))
+                   .whenPublishingA(new BankTransferSourceNotFoundEvent(bankTransferId))
                    .expectActiveSagas(0)
-                   .expectDispatchedCommands(new MarkBankTransferFailedCommand(bankTransferId));
+                   .expectDispatchedCommands(new BankTransferMarkFailedCommand(bankTransferId));
     }
 
     @Test
@@ -70,9 +70,9 @@ public class BankTransferManagementSagaTest {
                                                                                           destinationBankAccountId,
                                                                                           amountOfMoneyToTransfer))
                    .whenAggregate(sourceBankAccountId)
-                   .publishes(new SourceBankAccountDebitRejectedEvent(bankTransferId))
+                   .publishes(new BankTransferSourceDebitRejectedEvent(bankTransferId))
                    .expectActiveSagas(0)
-                   .expectDispatchedCommands(new MarkBankTransferFailedCommand(bankTransferId));
+                   .expectDispatchedCommands(new BankTransferMarkFailedCommand(bankTransferId));
     }
 
     @Test
@@ -86,11 +86,11 @@ public class BankTransferManagementSagaTest {
                                                                                           sourceBankAccountId,
                                                                                           destinationBankAccountId,
                                                                                           amountOfMoneyToTransfer))
-                   .whenAggregate(sourceBankAccountId).publishes(new SourceBankAccountDebitedEvent(sourceBankAccountId,
+                   .whenAggregate(sourceBankAccountId).publishes(new BankTransferSourceDebitedEvent(sourceBankAccountId,
                                                                                                    amountOfMoneyToTransfer,
                                                                                                    bankTransferId))
                    .expectActiveSagas(1)
-                   .expectDispatchedCommands(new CreditDestinationBankAccountCommand(destinationBankAccountId,
+                   .expectDispatchedCommands(new BankTransferDestinationCreditCommand(destinationBankAccountId,
                                                                                      bankTransferId,
                                                                                      amountOfMoneyToTransfer));
     }
@@ -106,13 +106,13 @@ public class BankTransferManagementSagaTest {
                                                                                           sourceBankAccountId,
                                                                                           destinationBankAccountId,
                                                                                           amountOfMoneyToTransfer))
-                   .andThenAggregate(sourceBankAccountId).published(new SourceBankAccountDebitedEvent(
+                   .andThenAggregate(sourceBankAccountId).published(new BankTransferSourceDebitedEvent(
                 sourceBankAccountId, amountOfMoneyToTransfer, bankTransferId))
-                   .whenPublishingA(new DestinationBankAccountNotFoundEvent(bankTransferId))
+                   .whenPublishingA(new BankTransferDestinationNotFoundEvent(bankTransferId))
                    .expectActiveSagas(0)
-                   .expectDispatchedCommands(new ReturnMoneyOfFailedBankTransferCommand(sourceBankAccountId,
+                   .expectDispatchedCommands(new BankTransferSourceReturnMoneyCommand(sourceBankAccountId,
                                                                                         amountOfMoneyToTransfer),
-                                             new MarkBankTransferFailedCommand(bankTransferId));
+                                             new BankTransferMarkFailedCommand(bankTransferId));
     }
 
     @Test
@@ -126,15 +126,15 @@ public class BankTransferManagementSagaTest {
                                                                                           sourceBankAccountId,
                                                                                           destinationBankAccountId,
                                                                                           amountOfMoneyToTransfer))
-                   .andThenAggregate(sourceBankAccountId).published(new SourceBankAccountDebitedEvent(
+                   .andThenAggregate(sourceBankAccountId).published(new BankTransferSourceDebitedEvent(
                 sourceBankAccountId,
                 amountOfMoneyToTransfer,
                 bankTransferId))
-                   .whenAggregate(destinationBankAccountId).publishes(new DestinationBankAccountCreditedEvent(
+                   .whenAggregate(destinationBankAccountId).publishes(new BankTransferDestinationCreditedEvent(
                 destinationBankAccountId,
                 amountOfMoneyToTransfer,
                 bankTransferId))
                    .expectActiveSagas(0)
-                   .expectDispatchedCommands(new MarkBankTransferCompletedCommand(bankTransferId));
+                   .expectDispatchedCommands(new BankTransferMarkCompletedCommand(bankTransferId));
     }
 }
