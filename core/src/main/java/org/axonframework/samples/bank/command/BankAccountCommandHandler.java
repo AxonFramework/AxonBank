@@ -21,14 +21,7 @@ import org.axonframework.commandhandling.model.Aggregate;
 import org.axonframework.commandhandling.model.AggregateNotFoundException;
 import org.axonframework.commandhandling.model.Repository;
 import org.axonframework.eventhandling.EventBus;
-import org.axonframework.samples.bank.api.bankaccount.CreateBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.CreditDestinationBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.DebitSourceBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.DepositMoneyCommand;
-import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountNotFoundEvent;
-import org.axonframework.samples.bank.api.bankaccount.ReturnMoneyOfFailedBankTransferCommand;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountNotFoundEvent;
-import org.axonframework.samples.bank.api.bankaccount.WithdrawMoneyCommand;
+import org.axonframework.samples.bank.api.bankaccount.*;
 
 import static org.axonframework.eventhandling.GenericEventMessage.asEventMessage;
 
@@ -40,23 +33,6 @@ public class BankAccountCommandHandler {
     public BankAccountCommandHandler(Repository<BankAccount> repository, EventBus eventBus) {
         this.repository = repository;
         this.eventBus = eventBus;
-    }
-
-    @CommandHandler
-    public void handle(CreateBankAccountCommand command) throws Exception {
-        repository.newInstance(() -> new BankAccount(command.getBankAccountId(), command.getOverdraftLimit()));
-    }
-
-    @CommandHandler
-    public void handle(DepositMoneyCommand command) {
-        Aggregate<BankAccount> bankAccountAggregate = repository.load(command.getBankAccountId());
-        bankAccountAggregate.execute(bankAccount -> bankAccount.deposit(command.getAmountOfMoney()));
-    }
-
-    @CommandHandler
-    public void handle(WithdrawMoneyCommand command) {
-        Aggregate<BankAccount> bankAccountAggregate = repository.load(command.getBankAccountId());
-        bankAccountAggregate.execute(bankAccount -> bankAccount.withdraw(command.getAmountOfMoney()));
     }
 
     @CommandHandler
@@ -81,11 +57,5 @@ public class BankAccountCommandHandler {
         catch (AggregateNotFoundException exception) {
             eventBus.publish(asEventMessage(new DestinationBankAccountNotFoundEvent(command.getBankTransferId())));
         }
-    }
-
-    @CommandHandler
-    public void handle(ReturnMoneyOfFailedBankTransferCommand command) {
-        Aggregate<BankAccount> bankAccountAggregate = repository.load(command.getBankAccountId());
-        bankAccountAggregate.execute(bankAccount -> bankAccount.returnMoney(command.getAmount()));
     }
 }

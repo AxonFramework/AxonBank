@@ -17,7 +17,7 @@
 package org.axonframework.samples.bank.web;
 
 import org.axonframework.commandhandling.CommandBus;
-import org.axonframework.commandhandling.GenericCommandMessage;
+import org.axonframework.commandhandling.callbacks.FutureCallback;
 import org.axonframework.samples.bank.api.bankaccount.CreateBankAccountCommand;
 import org.axonframework.samples.bank.api.bankaccount.DepositMoneyCommand;
 import org.axonframework.samples.bank.api.bankaccount.WithdrawMoneyCommand;
@@ -31,8 +31,13 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import reactor.io.net.http.model.Status;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
+import static org.axonframework.commandhandling.GenericCommandMessage.asCommandMessage;
 
 @Controller
 @MessageMapping("/bank-accounts")
@@ -62,18 +67,56 @@ public class BankAccountController {
     public void create(BankAccountDto bankAccountDto) {
         String id = UUID.randomUUID().toString();
         CreateBankAccountCommand command = new CreateBankAccountCommand(id, bankAccountDto.getOverdraftLimit());
-        commandBus.dispatch(GenericCommandMessage.asCommandMessage(command));
+        commandBus.dispatch(asCommandMessage(command));
     }
 
     @MessageMapping("/withdraw")
     public void withdraw(WithdrawalDto depositDto) {
         WithdrawMoneyCommand command = new WithdrawMoneyCommand(depositDto.getBankAccountId(), depositDto.getAmount());
-        commandBus.dispatch(GenericCommandMessage.asCommandMessage(command));
+        commandBus.dispatch(asCommandMessage(command));
     }
 
     @MessageMapping("/deposit")
     public void deposit(DepositDto depositDto) {
         DepositMoneyCommand command = new DepositMoneyCommand(depositDto.getBankAccountId(), depositDto.getAmount());
-        commandBus.dispatch(GenericCommandMessage.asCommandMessage(command));
+        commandBus.dispatch(asCommandMessage(command));
+    }
+
+    @PostMapping("/update")
+    public CompletableFuture<Response> handle(UpdateJobCategoryPayload payload) {
+
+        FutureCallback<UpdateJobCategory, Void> cb = new FutureCallback<>();
+
+        commandBus.dispatch(asCommandMessage(payload.asCommand()), cb);
+        return cb.thenApply(r -> Response.ok().build())
+                .exceptionally(e -> Response.status(Status.NOT_FOUND).build());
+    }
+
+    public static class Response {
+        public static Response ok() {
+            return new Response();
+        }
+
+        public Response build() {
+            return this;
+        }
+
+        public static Response serverError() {
+            return new Response();
+        }
+
+        public static Response status(Status notFound) {
+            return new Response();
+        }
+    }
+
+    public static class UpdateJobCategoryPayload {
+        public Object asCommand() {
+            return null;
+
+        }
+    }
+
+    private class UpdateJobCategory {
     }
 }
