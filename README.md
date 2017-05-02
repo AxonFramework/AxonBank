@@ -16,7 +16,7 @@ The distributed version requires Docker and Docker Compose to be installed. Ther
 ## Usage
 In order to run the single node version you may execute the following commands: 
 * `mvn clean install`
-* `mvn -pl web spring-boot:run`.
+* `java -jar web/target/axon-bank-web-0.0.1-SNAPSHOT.jar`.
 
 The distributed version can be run using the following commands:
 
