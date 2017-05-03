@@ -16,13 +16,12 @@
 
 package org.axonframework.samples.bank.web;
 
-import org.axonframework.commandhandling.CommandBus;
-import org.axonframework.commandhandling.GenericCommandMessage;
+import lombok.extern.slf4j.Slf4j;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.samples.bank.api.banktransfer.CreateBankTransferCommand;
 import org.axonframework.samples.bank.query.banktransfer.BankTransferEntry;
 import org.axonframework.samples.bank.query.banktransfer.BankTransferRepository;
 import org.axonframework.samples.bank.web.dto.BankTransferDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
@@ -31,35 +30,39 @@ import org.springframework.stereotype.Controller;
 import java.util.UUID;
 
 @Controller
+@Slf4j
 public class BankTransferController {
 
-    private CommandBus commandBus;
-    private BankTransferRepository bankTransferRepository;
+    private final CommandGateway commandGateway;
+    private final BankTransferRepository bankTransferRepository;
 
-    @Autowired
-    public BankTransferController(CommandBus commandBus,
-                                  BankTransferRepository bankTransferRepository) {
-        this.commandBus = commandBus;
+    public BankTransferController(CommandGateway commandGateway, BankTransferRepository bankTransferRepository) {
+        this.commandGateway = commandGateway;
         this.bankTransferRepository = bankTransferRepository;
     }
 
     @SubscribeMapping("/bank-accounts/{bankAccountId}/bank-transfers")
     public Iterable<BankTransferEntry> bankTransfers(@DestinationVariable String bankAccountId) {
+        log.info("Retrieve bank transfers for bank account with id {}", bankAccountId);
         return bankTransferRepository.findBySourceBankAccountIdOrDestinationBankAccountId(bankAccountId, bankAccountId);
     }
 
     @MessageMapping("/bank-transfers/{id}")
     public BankTransferEntry get(@DestinationVariable String id) {
+        log.info("Retrieve bank transfer with id {}", id);
         return bankTransferRepository.findOne(id);
     }
 
     @MessageMapping("/bank-transfers/create")
     public void create(BankTransferDto bankTransferDto) {
+        log.info("Create bank transfer with payload {}", bankTransferDto);
+
         String bankTransferId = UUID.randomUUID().toString();
         CreateBankTransferCommand command = new CreateBankTransferCommand(bankTransferId,
                                                                           bankTransferDto.getSourceBankAccountId(),
                                                                           bankTransferDto.getDestinationBankAccountId(),
                                                                           bankTransferDto.getAmount());
-        commandBus.dispatch(GenericCommandMessage.asCommandMessage(command));
+
+        commandGateway.send(command);
     }
 }
