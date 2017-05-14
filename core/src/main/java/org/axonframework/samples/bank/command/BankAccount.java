@@ -16,17 +16,10 @@
 
 package org.axonframework.samples.bank.command;
 
+import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.commandhandling.model.AggregateIdentifier;
-import org.axonframework.eventhandling.EventHandler;
-import org.axonframework.samples.bank.api.bankaccount.BankAccountCreatedEvent;
-import org.axonframework.samples.bank.api.bankaccount.DestinationBankAccountCreditedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneyAddedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneyDepositedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneyOfFailedBankTransferReturnedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneySubtractedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneyWithdrawnEvent;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitRejectedEvent;
-import org.axonframework.samples.bank.api.bankaccount.SourceBankAccountDebitedEvent;
+import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.samples.bank.api.bankaccount.*;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
@@ -43,17 +36,20 @@ public class BankAccount {
     private BankAccount() {
     }
 
-    public BankAccount(String bankAccountId, long overdraftLimit) {
-        apply(new BankAccountCreatedEvent(bankAccountId, overdraftLimit));
+    @CommandHandler
+    public BankAccount(CreateBankAccountCommand command) {
+        apply(new BankAccountCreatedEvent(command.getBankAccountId(), command.getOverdraftLimit()));
     }
 
-    public void deposit(long amount) {
-        apply(new MoneyDepositedEvent(id, amount));
+    @CommandHandler
+    public void deposit(DepositMoneyCommand command) {
+        apply(new MoneyDepositedEvent(id, command.getAmountOfMoney()));
     }
 
-    public void withdraw(long amount) {
-        if (amount <= balanceInCents + overdraftLimit) {
-            apply(new MoneyWithdrawnEvent(id, amount));
+    @CommandHandler
+    public void withdraw(WithdrawMoneyCommand command) {
+        if (command.getAmountOfMoney() <= balanceInCents + overdraftLimit) {
+            apply(new MoneyWithdrawnEvent(id, command.getAmountOfMoney()));
         }
     }
 
@@ -70,23 +66,24 @@ public class BankAccount {
         apply(new DestinationBankAccountCreditedEvent(id, amount, bankTransferId));
     }
 
-    public void returnMoney(long amount) {
-        apply(new MoneyOfFailedBankTransferReturnedEvent(id, amount));
+    @CommandHandler
+    public void returnMoney(ReturnMoneyOfFailedBankTransferCommand command) {
+        apply(new MoneyOfFailedBankTransferReturnedEvent(id, command.getAmount()));
     }
 
-    @EventHandler
+    @EventSourcingHandler
     public void on(BankAccountCreatedEvent event) {
         this.id = event.getId();
         this.overdraftLimit = event.getOverdraftLimit();
         this.balanceInCents = 0;
     }
 
-    @EventHandler
+    @EventSourcingHandler
     public void on(MoneyAddedEvent event) {
         balanceInCents += event.getAmount();
     }
 
-    @EventHandler
+    @EventSourcingHandler
     public void on(MoneySubtractedEvent event) {
         balanceInCents -= event.getAmount();
     }

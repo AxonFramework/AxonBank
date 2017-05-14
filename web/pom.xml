@@ -119,7 +119,7 @@
                 <configuration>
                     <imageName>axonframework/axonbank</imageName>
                     <baseImage>java:8</baseImage>
-                    <entryPoint>["java", "-jar", "-Dspring.profiles.active=distributed-command-bus", "-Djava.net.preferIPv4Stack=true", "/${project.build.finalName}.jar"]
+                    <entryPoint>["java", "-jar", "-Dspring.profiles.active=distributed", "/${project.build.finalName}.jar"]
                     </entryPoint>
                     <!-- copy the service's jar file from target into the root directory of the image -->
                     <resources>
