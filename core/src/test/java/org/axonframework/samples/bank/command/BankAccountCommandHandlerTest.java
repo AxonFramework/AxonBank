@@ -18,15 +18,11 @@ package org.axonframework.samples.bank.command;
 
 import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
 import org.axonframework.messaging.interceptors.JSR303ViolationException;
-import org.axonframework.samples.bank.api.bankaccount.BankAccountCreatedEvent;
-import org.axonframework.samples.bank.api.bankaccount.CreateBankAccountCommand;
-import org.axonframework.samples.bank.api.bankaccount.DepositMoneyCommand;
-import org.axonframework.samples.bank.api.bankaccount.MoneyDepositedEvent;
-import org.axonframework.samples.bank.api.bankaccount.MoneyWithdrawnEvent;
-import org.axonframework.samples.bank.api.bankaccount.WithdrawMoneyCommand;
+import org.axonframework.samples.bank.api.bankaccount.*;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.UUID;
 
@@ -84,4 +80,59 @@ public class BankAccountCommandHandlerTest {
                    .when(new WithdrawMoneyCommand(id, 51))
                    .expectEvents();
     }
+
+    @Test
+    public void testDebitNonExistingAccount() throws Exception {
+        String id = "bankAccountId";
+        String transfertId = "transfertId";
+        testFixture.givenNoPriorActivity()
+                .when(new DebitSourceBankAccountCommand(id, transfertId, 51))
+                .expectEvents(new SourceBankAccountNotFoundEvent(transfertId));
+    }
+
+    @Test
+    public void testCreditNonExistingAccount() throws Exception {
+        String id = "bankAccountId";
+        String transfertId = "transfertId";
+        testFixture.givenNoPriorActivity()
+                .when(new CreditDestinationBankAccountCommand(id, transfertId, 51))
+                .expectEvents(new DestinationBankAccountNotFoundEvent(transfertId));
+    }
+
+
+    @Test
+    public void testDebit() throws Exception {
+        String id = "bankAccountId";
+        String transfertId = "transfertId";
+        long debit = 30;
+
+        testFixture.given(new BankAccountCreatedEvent(id, 0), new MoneyDepositedEvent(id, 50))
+                .when(new DebitSourceBankAccountCommand(id, transfertId, debit))
+                .expectEvents(new SourceBankAccountDebitedEvent(id, debit,transfertId));
+    }
+
+
+    @Test
+    public void testDebitWithInsufficientBalance() throws Exception {
+        String id = "bankAccountId";
+        String transfertId = "transfertId";
+        long debit = 300;
+
+        testFixture.given(new BankAccountCreatedEvent(id, 0), new MoneyDepositedEvent(id, 50))
+                .when(new DebitSourceBankAccountCommand(id, transfertId, debit))
+                .expectEvents(new SourceBankAccountDebitRejectedEvent(transfertId));
+    }
+
+
+    @Test
+    public void testCredit() throws Exception {
+        String id = "bankAccountId";
+        String transfertId = "transfertId";
+        long credit = 30;
+
+        testFixture.given(new BankAccountCreatedEvent(id, 0), new MoneyDepositedEvent(id, 50))
+                .when(new CreditDestinationBankAccountCommand(id, transfertId, credit))
+                .expectEvents(new DestinationBankAccountCreditedEvent(id, credit,transfertId));
+    }
+
 }

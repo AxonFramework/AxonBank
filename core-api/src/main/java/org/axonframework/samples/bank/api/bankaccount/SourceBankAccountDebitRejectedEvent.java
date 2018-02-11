@@ -21,5 +21,5 @@ import lombok.Value;
 @Value
 public class SourceBankAccountDebitRejectedEvent {
 
-    private String BankTransferId;
+    private String bankTransferId;
 }

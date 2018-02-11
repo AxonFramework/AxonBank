@@ -21,7 +21,7 @@ import lombok.Value;
 @Value
 public class BankTransferCreatedEvent {
 
-    private String BankTransferId;
+    private String bankTransferId;
     private String sourceBankAccountId;
     private String destinationBankAccountId;
     private long amount;
