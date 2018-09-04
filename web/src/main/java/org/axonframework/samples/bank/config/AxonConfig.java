@@ -37,17 +37,20 @@ public class AxonConfig {
     @Autowired
     private EventBus eventBus;
 
+    // 注册银行账户Command
     @Bean
     public BankAccountCommandHandler bankAccountCommandHandler() {
         return new BankAccountCommandHandler(axonConfiguration.repository(BankAccount.class), eventBus);
     }
 
+    // 注册Saga事件管理
     @Bean
     public SagaConfiguration bankTransferManagementSagaConfiguration() {
         return SagaConfiguration.trackingSagaManager(BankTransferManagementSaga.class);
     }
 
-    @Autowired
+    // 注册拦截器
+  @Autowired
     public void configure(@Qualifier("localSegment") SimpleCommandBus simpleCommandBus) {
         simpleCommandBus.registerDispatchInterceptor(new BeanValidationInterceptor<>());
     }
